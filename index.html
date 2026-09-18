@@ -177,6 +177,9 @@ el.innerHTML=Object.entries(groups).map(([day,items])=>`<div class="card" style=
 }
 function show(id,btn){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
 resetIfNeeded();render();setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});renderPowers()},30000);
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/Project-Superhero/sw.js");
+}
 </script>
 </body>
 </html>
