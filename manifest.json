@@ -1,0 +1,9 @@
+{
+  "name": "Project Superhero",
+  "short_name": "Superhero",
+  "start_url": "/Project-Superhero/",
+  "scope": "/Project-Superhero/",
+  "display": "standalone",
+  "background_color": "#162a49",
+  "theme_color": "#ffd84d"
+}
