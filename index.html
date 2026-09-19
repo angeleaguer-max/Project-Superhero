@@ -131,6 +131,10 @@ input,textarea{font-size:16px}
 .historyDetails.open{display:block}
 @media (max-width:380px){.currentPicker.open{grid-template-columns:1fr 1fr}}
 
+
+.heroCard{border-color:#5e7eaa}.heroTop{display:flex;align-items:center;gap:14px}.heroEmblem{width:58px;height:58px;border-radius:18px;background:var(--accent);color:#162a49;display:grid;place-items:center;font-size:30px;font-weight:900;box-shadow:0 8px 22px #0004}.heroTop h2{margin:0}.heroStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.heroStat{background:#172d4d;border:1px solid var(--line);border-radius:12px;padding:9px}.heroStat .statHead{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.heroStat .bar{height:7px;background:#0f2038;border-radius:999px;overflow:hidden;margin-top:6px}.heroStat .bar div{height:100%;width:0;background:var(--accent);border-radius:999px}.unlockBadges{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.unlock{border:1px solid var(--line);background:#172d4d;border-radius:999px;padding:6px 9px;font-size:12px}.unlock.locked{opacity:.45}.world{transition:transform .25s ease,box-shadow .25s ease}.world.level1{box-shadow:0 0 28px #ffffff0a}.world.level2{box-shadow:0 0 34px #79e6aa18}.world.level3{box-shadow:0 0 42px #ffd84d22}.world.level4{box-shadow:0 0 52px #ffd84d38;transform:translateY(-1px)}.worldStage{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin:16px 0 10px;background:#172d4d;border:1px solid var(--line);border-radius:12px}.world.level1{}.world.level2{}.world.level3{}.world.level4{}
+.encounterChoice.selected{border-color:var(--accent);box-shadow:0 0 0 2px #ffd84d33 inset}
+@media(max-width:520px){.heroStats{grid-template-columns:1fr}.heroEmblem{width:50px;height:50px}}
 </style>
 </head>
 <body>
@@ -158,6 +162,13 @@ input,textarea{font-size:16px}
     </div>
     <div id="currentPicker" class="currentPicker"></div>
   </div>
+</div>
+
+<div class="card heroCard">
+  <div class="homeSectionTitle">🦸 YOUR HERO</div>
+  <div class="heroTop"><div class="heroEmblem">✝</div><div><h2 id="heroTitle">Faithful Hero</h2><div class="small" id="heroSubtitle">Level 1 • Growing in Faith, Hope & Love</div></div></div>
+  <div id="heroStats" class="heroStats"></div>
+  <div id="unlockBadges" class="unlockBadges"></div>
 </div>
 
 <div class="homeQuick">
@@ -302,12 +313,26 @@ document.getElementById('fhl').innerHTML=[['✝️','FAITH','faith'],['💙','HO
 let fb=document.getElementById('focusBtn');document.getElementById('focusName').textContent=s.focus?({faith:'FAITH',hope:'HOPE',love:'LOVE'}[s.focus]+' FOCUSED'):"Choose today's focus";fb.className=s.focus?'selected':'';
 document.getElementById('current').textContent=s.current;document.getElementById('currentHint').textContent='PS is using this as your present context.';
 renderCurrentPicker();
+renderHero();
 renderNextMove();
 document.getElementById('settings').innerHTML=s.settings.length?s.settings.map(x=>`<span class="chip on">${x}</span>`).join(''):'<span class="small">No featured settings yet.</span>';
 renderLoadoutVerse();
 let available=missions.filter(m=>m.ctx===s.current).sort((a,b)=>(b.f===s.focus)-(a.f===s.focus));renderMissions('missions',available.slice(0,4));renderMissions('allmissions',missions.filter(m=>m.ctx===s.current));
 document.getElementById('notesText').value=s.notes||'';renderPowers();renderChain();renderHistory();renderWorld();
 }
+function renderHero(){
+ let total=(s.fhl.faith||0)+(s.fhl.hope||0)+(s.fhl.love||0);
+ let title=s.level>=10?'🛡️ Veteran Hero':s.level>=5?'⚔️ Seasoned Hero':s.level>=3?'🌟 Rising Hero':'🦸 Faithful Hero';
+ document.getElementById('heroTitle').textContent=title;
+ document.getElementById('heroSubtitle').textContent=`Level ${s.level} • ${total} combined FHL • Excellence ${s.excellence||0}`;
+ let max=Math.max(5,total+2);
+ document.getElementById('heroStats').innerHTML=[['✝️','Faith','faith'],['💙','Hope','hope'],['❤️','Love','love']].map(([icon,n,k])=>{let v=s.fhl[k]||0;return `<div class="heroStat"><div class="statHead"><span>${icon} ${n}</span><span>${v}</span></div><div class="bar"><div style="width:${Math.min(100,v/max*100)}%"></div></div></div>`}).join('');
+ let badges=[
+  ['🌱','First Steps',total>=3],['⚔️','Encounter Ready',s.history.some(h=>h.type==='encounter')],['🏆','Excellence', (s.excellence||0)>=1],['🌟','Level 5',s.level>=5],['💎','FHL 10+',total>=10]
+ ];
+ document.getElementById('unlockBadges').innerHTML=badges.map(b=>`<span class="unlock ${b[2]?'':'locked'}">${b[0]} ${b[1]}${b[2]?'':' 🔒'}</span>`).join('');
+}
+
 function renderMissions(id,list){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No objectives here yet. Change Current to reveal more.</div>';return}el.innerHTML=list.map(m=>{let f=m.f?m.f.toUpperCase():'NONE',val=m.f?s.fhl[m.f]:999,locked=m.f&&val<m.req;return `<div class="card mission"><h3>${locked?'🔒 ':''}${esc(m.name)}</h3><div class="tag">${m.ctx} • ${m.f?f+' ≥ '+m.req:'OPEN'} ${m.f===s.focus?'• FOCUS BONUS':''}</div><p style="margin-top:7px">${esc(m.desc)}</p><div class="reward">+${m.xp} XP</div><button ${locked?'disabled':''} class="${locked?'':'primary'}" style="margin-top:9px;width:100%" onclick="complete('${m.id}')">${locked?'Need '+f+' ≥ '+m.req:'Complete Objective'}</button></div>`}).join('')}
 function renderCurrentPicker(){let el=document.getElementById('currentPicker');if(!el)return;el.innerHTML=contexts.map(x=>`<button class="${x[0]===s.current?'primary':''}" onclick="setCurrent('${x[0]}')">${x[0]}</button>`).join('')}
 function toggleCurrentPicker(){let el=document.getElementById('currentPicker');if(el)el.classList.toggle('open')}
@@ -362,20 +387,29 @@ document.getElementById('encounterModal').style.display='none';
 showFlowToast('🏆 VICTORY',''+encounterName+' • +'+xp+' XP');
 }
 function renderWorld(){
-let el=document.getElementById('worldStats');if(!el)return;
-let missionsDone=s.history.filter(h=>h.type==='mission').length;
-let encountersDone=s.history.filter(h=>h.type==='encounter').length;
-let excellence=s.excellence||0;
-let faith=s.fhl.faith||0,hope=s.fhl.hope||0,love=s.fhl.love||0;
-let total=Math.max(1,missionsDone+encountersDone+excellence);
-let state=missionsDone===0?'The world is waiting for your first move.':encountersDone===0?'Your actions are starting to build momentum.':excellence>0?'Your faithful actions are leaving a lasting mark.':'Your progress is beginning to change the landscape.';
-document.getElementById('worldtext').textContent=state;
-let cards=[['⚔️','Missions',missionsDone,Math.min(100,missionsDone*10)],['⚡','Encounters',encountersDone,Math.min(100,encountersDone*20)],['🏆','Excellence',excellence,Math.min(100,excellence*20)],['✝️','Faith / Hope / Love',faith+' / '+hope+' / '+love,Math.min(100,((faith+hope+love)/30)*100)]];
-el.innerHTML=cards.map(c=>`<div class="worldStat"><div class="row"><b>${c[0]} ${c[1]}</b><span class="small">${c[2]}</span></div><div class="worldBar"><div class="fill" style="width:${c[3]}%"></div></div></div>`).join('');
+ let el=document.getElementById('worldStats');if(!el)return;
+ let missionsDone=s.history.filter(h=>h.type==='mission').length;
+ let encountersDone=s.history.filter(h=>h.type==='encounter').length;
+ let excellence=s.excellence||0;
+ let faith=s.fhl.faith||0,hope=s.fhl.hope||0,love=s.fhl.love||0;
+ let power=missionsDone+encountersDone*2+excellence*3+Math.floor((faith+hope+love)/3);
+ let stage=power>=30?4:power>=18?3:power>=8?2:power>=1?1:0;
+ let states=[
+  ['The world is waiting for your first move.','🌑 The world is quiet. Your first faithful action will wake it.'],
+  ['Your first actions are creating a foundation.','🌱 A small light has appeared. Keep moving and the world will grow.'],
+  ['Your progress is opening new ground.','🌿 The path is taking shape. Encounters and faithful choices are leaving a mark.'],
+  ['Your faithful actions are changing the landscape.','🌳 The world is becoming stronger and more alive through your progress.'],
+  ['Your journey has become a living world.','✨ The world is flourishing. Keep building, serving, and standing firm.']
+ ];
+ let world=document.querySelector('.world');if(world)world.className='card world level'+stage;
+ document.getElementById('worldtext').textContent=states[stage][1];
+ let cards=[['⚔️','Missions',missionsDone,Math.min(100,missionsDone*10)],['⚡','Encounters',encountersDone,Math.min(100,encountersDone*20)],['🏆','Excellence',excellence,Math.min(100,excellence*20)],['✝️','Faith / Hope / Love',faith+' / '+hope+' / '+love,Math.min(100,((faith+hope+love)/30)*100)]];
+ el.innerHTML=`<div class="worldStage"><b>${states[stage][0]}</b><span class="small">World Stage ${stage+1}</span></div>`+cards.map(c=>`<div class="worldStat"><div class="row"><b>${c[0]} ${c[1]}</b><span class="small">${c[2]}</span></div><div class="worldBar"><div class="fill" style="width:${c[3]}%"></div></div></div>`).join('');
 }
+
 function chooseEncounterAction(btn,action){
 document.querySelectorAll('.encounterChoice').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
-let field=document.getElementById('encounterSupport');let existing=field.value.trim();field.value=existing&&existing!==action?existing+'\n'+action:action;field.focus();
+let field=document.getElementById('encounterSupport');let existing=field.value.trim();if(!existing)field.value=action;else if(!existing.split('\n').includes(action))field.value=existing+'\n'+action;field.focus();
 }
 function renderPowers(){s.powers=s.powers.filter(p=>p.until>Date.now());let el=document.getElementById('powers');el.innerHTML=s.powers.length?s.powers.map((p,i)=>`<button style="width:100%;text-align:left;margin:4px 0" onclick="showBlessing(${i})"><div class="row"><b>✨ ${esc(p.name)}</b><span class="small">${fmt(p.until-Date.now())}</span></div><div id="blessDetail${i}" class="small" style="display:none;margin-top:6px">Activated by: <b>${esc(p.activatedBy||'Unknown')}</b><br>Activated: ${new Date(p.activatedAt||Date.now()).toLocaleString()}</div></button>`).join(''):'<div class="empty">No active blessing. Complete objectives and keep moving faithfully.</div>'}
 function showBlessing(i){let el=document.getElementById('blessDetail'+i);if(el)el.style.display=el.style.display==='none'?'block':'none'}
