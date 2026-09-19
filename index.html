@@ -92,6 +92,9 @@ input,textarea{font-size:16px}
 .homeCurrentMain{font-size:22px;font-weight:850}
 .homeCurrentSub{font-size:12px;color:var(--muted);margin-top:2px}
 .homeQuick{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;margin-top:12px}
+.loadoutVerse{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.verseItem{padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+.verseItem:first-of-type{border-top:0}
 .homeQuick .card{margin:0}
 .homeHomebase{border-color:#6aa8ff55;background:#172d4d}
 .homeNext{border-color:#ffe47766;background:linear-gradient(145deg,#203c63,#172d4d)}
@@ -167,8 +170,6 @@ input,textarea{font-size:16px}
   <div id="nextMove"></div>
 </div>
 
-<div class="card"><div class="row"><h2>🎒 TODAY'S LOADOUT</h2><button onclick="toggleSettings()">Edit</button></div><div id="settings"></div><div id="settingsEdit" style="display:none"></div></div>
-
 <div class="card"><div class="row"><h2>⚔️ ACTIVE OBJECTIVES</h2><button onclick="newEncounter()">⚡ Encounter</button></div><div id="missions"></div></div>
 
 <div class="card"><h2>🛡️ BLESSINGS</h2><div id="powers"></div></div>
@@ -177,6 +178,10 @@ input,textarea{font-size:16px}
 </section>
 
 <section id="missionsView" class="view">
+<div class="card">
+<div class="row"><div><h2>🎒 TODAY'S LOADOUT</h2><p class="small" style="margin-top:5px">Choose what you are carrying into today. Each setting brings its own preset Scripture.</p></div><button onclick="toggleSettings()">Edit</button></div>
+<div id="settings"></div><div id="settingsEdit" style="display:none"></div><div id="loadoutVerse"></div>
+</div>
 <div class="card"><h2>⚔️ Missions</h2><p class="small" style="margin-top:5px">Available through your current setting and today's focus.</p><div id="allmissions"></div></div>
 </section>
 
@@ -238,6 +243,17 @@ const defaultState={xp:0,level:1,fhl:{faith:1,hope:1,love:1},focus:null,current:
 let s=JSON.parse(localStorage.getItem(KEY)||'null')||defaultState;
 const contexts=[['🏠 HOME','Home'],['🏢 WORK','Work'],['🚗 TRAVEL','Travel'],['⛪ CHURCH','Church'],['👥 PEOPLE','People'],['🧹 CHORES','Chores'],['😴 REST','Rest']];
 const settingOptions=['🏢 WORK','🏠 HOME','👥 PEOPLE','🧹 CHORES','🚗 TRAVEL','⛪ CHURCH','📖 BIBLE','🙏 PRAYER','😴 REST'];
+const loadoutVerses={
+'🏢 WORK':{ref:'Colossians 3:23',text:'And whatsoever ye do, do it heartily, as to the Lord, and not unto men;'},
+'🏠 HOME':{ref:'Joshua 24:15',text:'As for me and my house, we will serve the Lord.'},
+'👥 PEOPLE':{ref:'Ephesians 4:32',text:'And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you.'},
+'🧹 CHORES':{ref:'Galatians 6:9',text:'And let us not be weary in well doing: for in due season we shall reap, if we faint not.'},
+'🚗 TRAVEL':{ref:'Psalm 121:8',text:'The Lord shall preserve thy going out and thy coming in from this time forth, and even for evermore.'},
+'⛪ CHURCH':{ref:'1 Peter 4:10',text:'As every man hath received the gift, even so minister the same one to another.'},
+'📖 BIBLE':{ref:'Psalm 119:105',text:'Thy word is a lamp unto my feet, and a light unto my path.'},
+'🙏 PRAYER':{ref:'Philippians 4:6',text:'But in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.'},
+'😴 REST':{ref:'Psalm 4:8',text:'I will both lay me down in peace, and sleep: for thou, Lord, only makest me dwell in safety.'}
+};
 const missions=[
 {id:'work-love',name:'Love Your Coworker',ctx:'🏢 WORK',f:'love',req:1,xp:20,desc:'Choose kindness in your next interaction.'},
 {id:'work-hope',name:'Keep Going',ctx:'🏢 WORK',f:'hope',req:1,xp:20,desc:'Persevere when the work feels daunting.'},
@@ -272,6 +288,7 @@ document.getElementById('current').textContent=s.current;document.getElementById
 renderCurrentPicker();
 renderNextMove();
 document.getElementById('settings').innerHTML=s.settings.length?s.settings.map(x=>`<span class="chip on">${x}</span>`).join(''):'<span class="small">No featured settings yet.</span>';
+renderLoadoutVerse();
 let available=missions.filter(m=>m.ctx===s.current).sort((a,b)=>(b.f===s.focus)-(a.f===s.focus));renderMissions('missions',available.slice(0,4));renderMissions('allmissions',missions.filter(m=>m.ctx===s.current));
 document.getElementById('notesText').value=s.notes||'';renderPowers();renderChain();renderHistory();document.getElementById('worldtext').textContent=s.focus?`${({faith:'Faith',hope:'Hope',love:'Love'})[s.focus]} is your stance today.`:'Your command center is ready.';
 }
@@ -289,6 +306,7 @@ function cycleCurrent(){let i=contexts.findIndex(x=>x[0]===s.current);s.current=
 let toastTimer=null;
 function showFlowToast(title,detail){let el=document.getElementById('flowToast');if(!el)return;el.innerHTML=`<b>${esc(title)}</b><div class="small" style="margin-top:3px">${esc(detail||'')}</div>`;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
 function toggleSettings(){let el=document.getElementById('settingsEdit');el.style.display=el.style.display==='none'?'block':'none';el.innerHTML=settingOptions.map(x=>`<button class="chip ${s.settings.includes(x)?'on':''}" onclick="toggleSetting('${x}')">${x}</button>`).join('')}
+function renderLoadoutVerse(){let el=document.getElementById('loadoutVerse');if(!el)return;if(!s.settings.length){el.innerHTML='<div class="empty" style="margin-top:10px">Your loadout is empty. Tap Edit to choose what you are carrying today.</div>';return}let verses=s.settings.map(x=>loadoutVerses[x]).filter(Boolean);el.innerHTML=`<div class="loadoutVerse"><div class="homeSectionTitle">📖 LOADOUT SCRIPTURE</div>${verses.map(v=>`<div class="verseItem"><b>${esc(v.ref)}</b><div class="small" style="margin-top:4px">${esc(v.text)}</div></div>`).join('')}</div>`;}
 function toggleSetting(x){s.settings=s.settings.includes(x)?s.settings.filter(y=>y!==x):[...s.settings,x];save();document.getElementById('settingsEdit').style.display='block'}
 function newEncounter(){let e=encounters.find(x=>x.ctx===s.current);if(!e){alert('No encounter template for this context yet.');return}openEncounter(e)}
 function openEncounter(e){s.activeEncounter=e.id;document.getElementById('encounterTitle').textContent=e.name;document.getElementById('encounterName').value=e.name;document.getElementById('encounterType').textContent=e.type+' • '+e.ctx;document.getElementById('encounterDesc').textContent=e.desc;document.getElementById('encounterObjective').textContent=e.objective;document.getElementById('encounterPrimary').value='';document.getElementById('encounterSupport').value='';document.getElementById('encounterXP').value='25';document.getElementById('encounterFaith').value='0';document.getElementById('encounterHope').value='0';document.getElementById('encounterLove').value='0';document.getElementById('encounterError').style.display='none';document.getElementById('encounterModal').style.display='block'}
