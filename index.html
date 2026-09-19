@@ -211,10 +211,10 @@ input,textarea{font-size:16px}
 <div class="small">🎯 OBJECTIVE</div><h3 id="encounterObjective" style="margin-top:5px"></h3>
 </div>
 <div class="card" style="margin:14px 0;background:#172d4d">
-<div class="small">📖 PRIMARY SCRIPTURE • REQUIRED</div>
+<div class="small">⚔️ SWORD OF THE SPIRIT • REQUIRED</div>
 <textarea id="encounterPrimary" style="min-height:95px;margin-top:8px" placeholder="Verse or passage you will use..."></textarea>
-<div class="small" style="margin-top:12px">📚 SUPPORTING SCRIPTURES • OPTIONAL</div>
-<textarea id="encounterSupport" style="min-height:75px;margin-top:8px" placeholder="Additional verses/passages..."></textarea>
+<div class="small" style="margin-top:12px">🛡️ ACTIONS TAKEN • OR INSTEAD OF SCRIPTURE</div>
+<textarea id="encounterSupport" style="min-height:75px;margin-top:8px" placeholder="What action did you take in response?"></textarea>
 </div>
 <div class="card" style="margin:14px 0;background:#172d4d">
 <div class="small">🎁 CHOOSE YOUR REWARD</div>
@@ -315,7 +315,8 @@ function completeEncounter(){
 let e=encounters.find(x=>x.id===s.activeEncounter);if(!e)return;
 let encounterName=document.getElementById('encounterName').value.trim()||e.name;
 let primary=document.getElementById('encounterPrimary').value.trim();
-if(!primary){let er=document.getElementById('encounterError');er.textContent='Choose the primary verse or passage used for this encounter.';er.style.display='block';return}
+let actions=document.getElementById('encounterSupport').value.trim();
+if(!primary&&!actions){let er=document.getElementById('encounterError');er.textContent='Enter the Sword of the Spirit you used, or record the action you took instead.';er.style.display='block';return}
 let xp=Math.max(0,Math.min(500,parseInt(document.getElementById('encounterXP').value,10)||0));
 let faith=Math.max(0,Math.min(10,parseInt(document.getElementById('encounterFaith').value,10)||0));
 let hope=Math.max(0,Math.min(10,parseInt(document.getElementById('encounterHope').value,10)||0));
@@ -334,7 +335,7 @@ s.history.unshift({
     day:today(),
     details:e.objective,
     primary,
-    support,
+    actions,
     xp,
     faith,
     hope,
@@ -372,7 +373,7 @@ ${h.type==='notes'&&h.details?`<div class="small"><b>Notes:</b> ${esc(h.details)
 ${h.type==='encounter'?`
 <div class="small" style="margin-top:6px"><b>Objective:</b> ${esc(h.details||'')}</div>
 <div class="small" style="margin-top:4px"><b>📖 Primary Scripture:</b> ${esc(h.primary||'')}</div>
-${h.support?`<div class="small" style="margin-top:4px"><b>📚 Supporting Scriptures:</b> ${esc(h.support)}</div>`:''}
+${h.actions?`<div class="small" style="margin-top:4px"><b>🛡️ Actions Taken:</b> ${esc(h.actions)}</div>`:''}
 <div class="small" style="margin-top:4px"><b>Rewards:</b> ${h.xp||0} XP • ✝️ ${h.faith||0} • 💙 ${h.hope||0} • ❤️ ${h.love||0}</div>
 `:''}
 </div></div></div>`}).join('')}</div>`).join('');
