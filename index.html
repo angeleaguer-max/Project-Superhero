@@ -80,6 +80,25 @@ input,textarea{font-size:16px}
 .splashTitle{font-size:clamp(21px,6vw,30px);font-weight:900;letter-spacing:2px}
 .splashSub{margin-top:9px;font-size:11px;letter-spacing:3px;color:var(--muted)}
 
+/* Home HUD polish */
+.homeWelcome{padding:22px 20px 18px;background:linear-gradient(145deg,#315887,#1c3355);border-color:#6b8fbe;position:relative;overflow:hidden}
+.homeWelcome:after{content:"✦";position:absolute;right:18px;top:12px;font-size:54px;color:#ffd84d22;transform:rotate(12deg)}
+.homeEyebrow{font-size:11px;letter-spacing:2px;color:var(--muted);font-weight:800}
+.homeTitle{font-size:28px;line-height:1.08;font-weight:900;margin-top:4px}
+.homeDate{margin-top:7px;color:var(--muted);font-size:13px}
+.homeSection{margin-top:16px}
+.homeSectionTitle{font-size:12px;letter-spacing:1.2px;color:var(--muted);font-weight:800;margin-bottom:8px}
+.homeCurrent{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.homeCurrentMain{font-size:22px;font-weight:850}
+.homeCurrentSub{font-size:12px;color:var(--muted);margin-top:2px}
+.homeQuick{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;margin-top:12px}
+.homeQuick .card{margin:0}
+.homeHomebase{border-color:#6aa8ff55;background:#172d4d}
+.homeNext{border-color:#ffe47766;background:linear-gradient(145deg,#203c63,#172d4d)}
+.homeNext .nextAction{margin-top:10px;width:100%}
+.homeDivider{height:1px;background:var(--line);opacity:.55;margin:15px 0 2px}
+@media(max-width:520px){.homeQuick{grid-template-columns:1fr}.homeTitle{font-size:26px}}
+
 /* Flow polish */
 .nextmove{border-color:#6aa8ff55;background:#172d4d}
 .nextmove .nextAction{margin-top:10px;width:100%}
@@ -114,17 +133,38 @@ input,textarea{font-size:16px}
 <header><div><div class="brand">✝ PROJECT SUPERHERO</div><div class="sub" id="date"></div></div><div class="sub" id="clock"></div></header>
 
 <section id="hud" class="view active">
-<div class="card hero">
-<div class="sub">LEVEL</div><div class="level" id="level">1</div><div class="small" id="xptext">0 / 100 XP</div><div class="xpbar"><div class="fill" id="xpfill"></div></div>
-<div class="fhl" id="fhl"></div>
-<div class="focus"><button id="focusBtn" onclick="cycleFocus()">🎯 <b id="focusName">Choose today's focus</b><br><span class="small">Your primary expected resource for today</span></button></div>
+<div class="card homeWelcome">
+  <div class="homeEyebrow">🏠 HOME BASE</div>
+  <div class="homeTitle">Welcome back, Superhero.</div>
+  <div class="homeDate" id="homeDate">Your run for today.</div>
+  <div class="homeDivider"></div>
+  <div class="homeSection">
+    <div class="homeSectionTitle">CURRENT SETTING</div>
+    <div class="homeCurrent">
+      <div><div class="homeCurrentMain" id="current"></div><div class="homeCurrentSub" id="currentHint"></div></div>
+      <button onclick="toggleCurrentPicker()">Change</button>
+    </div>
+    <div id="currentPicker" class="currentPicker"></div>
+  </div>
 </div>
 
-<div class="card"><div class="row"><h2>📍 CURRENT</h2><button onclick="toggleCurrentPicker()">Change</button></div><div style="font-size:22px;font-weight:800;margin-top:8px" id="current"></div><div class="small" id="currentHint"></div><div id="currentPicker" class="currentPicker"></div></div>
+<div class="homeQuick">
+  <div class="card homeHomebase">
+    <div class="homeSectionTitle">YOUR PROGRESS</div>
+    <div class="row"><div><div class="sub">LEVEL</div><div class="level" id="level">1</div></div><div style="text-align:right"><div class="small" id="xptext">0 / 100 XP</div></div></div>
+    <div class="xpbar"><div class="fill" id="xpfill"></div></div>
+    <div class="fhl" id="fhl"></div>
+  </div>
+  <div class="card homeHomebase">
+    <div class="homeSectionTitle">TODAY'S FOCUS</div>
+    <div class="focus" style="margin-top:0"><button id="focusBtn" onclick="cycleFocus()">🎯 <b id="focusName">Choose today's focus</b><br><span class="small">Your primary expected resource</span></button></div>
+  </div>
+</div>
 
-<div class="card nextmove">
-<div class="row"><div><h2>➡️ NEXT MOVE</h2><div class="small" style="margin-top:4px">The clearest objective available right now.</div></div></div>
-<div id="nextMove"></div>
+<div class="card homeNext nextmove">
+  <div class="homeSectionTitle">WHAT'S NEXT</div>
+  <div class="row"><div><h2>➡️ NEXT MOVE</h2><div class="small" style="margin-top:4px">One clear thing to do from here.</div></div></div>
+  <div id="nextMove"></div>
 </div>
 
 <div class="card"><div class="row"><h2>🎒 TODAY'S LOADOUT</h2><button onclick="toggleSettings()">Edit</button></div><div id="settings"></div><div id="settingsEdit" style="display:none"></div></div>
@@ -221,6 +261,7 @@ function today(){return new Date().toISOString().slice(0,10)}
 function resetIfNeeded(){if(s.lastDate!==today()){s.lastDate=today();s.focus=null;s.settings=[];s.powers=[];s.chain=0;s.notes='';s.history.unshift({type:'day',name:'🌅 New daily run started',time:new Date().toISOString()});save()}}
 function esc(x){return String(x).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function render(){
+let hd=document.getElementById('homeDate');if(hd)hd.textContent='Your run for '+new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
 document.getElementById('date').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
 document.getElementById('clock').textContent=new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 document.getElementById('level').textContent=s.level;
