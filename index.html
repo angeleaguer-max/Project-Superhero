@@ -58,6 +58,15 @@ input,textarea{font-size:16px}
   .stat b{font-size:17px}
   .nav button{font-size:10px}
 }
+
+.encounterChoices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.encounterChoice{min-height:48px;text-align:left}
+.encounterChoice.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;background:#203c63}
+.worldStats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.worldStat{padding:12px;border:1px solid var(--line);border-radius:14px;background:#172d4d}
+.worldBar{height:7px;background:#0e2038;border-radius:99px;overflow:hidden;margin-top:8px}
+.worldBar .fill{height:100%;background:var(--accent);border-radius:99px}
+@media(max-width:420px){.encounterChoices,.worldStats{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){
   .view.active{animation:viewIn .16s ease-out}
   .card button:active{transform:scale(.975)}
@@ -196,7 +205,7 @@ input,textarea{font-size:16px}
 
 <section id="log" class="view"><div class="card"><div class="row"><div><h2>📜 History</h2><p class="small" style="margin-top:5px">Your recorded journey, day by day.</p></div><button onclick="clearHistoryView()">Refresh</button></div><div id="history"></div></div></section>
 
-<section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Enter the world.</p></div></div></section>
+<section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Your actions are shaping the world.</p><div id="worldStats" class="worldStats"></div></div></div></section>
 </div>
 
 <div id="encounterModal" style="display:none;position:fixed;inset:0;background:#071426E8;z-index:20;padding:18px;overflow:auto">
@@ -211,10 +220,17 @@ input,textarea{font-size:16px}
 <div class="small">🎯 OBJECTIVE</div><h3 id="encounterObjective" style="margin-top:5px"></h3>
 </div>
 <div class="card" style="margin:14px 0;background:#172d4d">
-<div class="small">⚔️ SWORD OF THE SPIRIT • REQUIRED</div>
-<textarea id="encounterPrimary" style="min-height:95px;margin-top:8px" placeholder="Verse or passage you will use..."></textarea>
-<div class="small" style="margin-top:12px">🛡️ ACTIONS TAKEN • OR INSTEAD OF SCRIPTURE</div>
-<textarea id="encounterSupport" style="min-height:75px;margin-top:8px" placeholder="What action did you take in response?"></textarea>
+<div class="small">⚔️ HOW WILL YOU RESPOND?</div>
+<div class="encounterChoices">
+<button type="button" class="encounterChoice" onclick="chooseEncounterAction(this,'🗡️ Used Scripture')">🗡️ Use Scripture</button>
+<button type="button" class="encounterChoice" onclick="chooseEncounterAction(this,'🤝 Act in Love')">🤝 Act in Love</button>
+<button type="button" class="encounterChoice" onclick="chooseEncounterAction(this,'🛡️ Stand Firm')">🛡️ Stand Firm</button>
+<button type="button" class="encounterChoice" onclick="chooseEncounterAction(this,'🙏 Pray First')">🙏 Pray First</button>
+</div>
+<div class="small" style="margin-top:14px">🗡️ SWORD OF THE SPIRIT</div>
+<textarea id="encounterPrimary" style="min-height:78px;margin-top:8px" placeholder="Verse or passage you used (optional if you record an action below)..."></textarea>
+<div class="small" style="margin-top:12px">🛡️ ACTION TAKEN</div>
+<textarea id="encounterSupport" style="min-height:75px;margin-top:8px" placeholder="What did you actually do in response?"></textarea>
 </div>
 <div class="card" style="margin:14px 0;background:#172d4d">
 <div class="small">🎁 CHOOSE YOUR REWARD</div>
@@ -290,7 +306,7 @@ renderNextMove();
 document.getElementById('settings').innerHTML=s.settings.length?s.settings.map(x=>`<span class="chip on">${x}</span>`).join(''):'<span class="small">No featured settings yet.</span>';
 renderLoadoutVerse();
 let available=missions.filter(m=>m.ctx===s.current).sort((a,b)=>(b.f===s.focus)-(a.f===s.focus));renderMissions('missions',available.slice(0,4));renderMissions('allmissions',missions.filter(m=>m.ctx===s.current));
-document.getElementById('notesText').value=s.notes||'';renderPowers();renderChain();renderHistory();document.getElementById('worldtext').textContent=s.focus?`${({faith:'Faith',hope:'Hope',love:'Love'})[s.focus]} is your stance today.`:'Your command center is ready.';
+document.getElementById('notesText').value=s.notes||'';renderPowers();renderChain();renderHistory();renderWorld();
 }
 function renderMissions(id,list){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No objectives here yet. Change Current to reveal more.</div>';return}el.innerHTML=list.map(m=>{let f=m.f?m.f.toUpperCase():'NONE',val=m.f?s.fhl[m.f]:999,locked=m.f&&val<m.req;return `<div class="card mission"><h3>${locked?'🔒 ':''}${esc(m.name)}</h3><div class="tag">${m.ctx} • ${m.f?f+' ≥ '+m.req:'OPEN'} ${m.f===s.focus?'• FOCUS BONUS':''}</div><p style="margin-top:7px">${esc(m.desc)}</p><div class="reward">+${m.xp} XP</div><button ${locked?'disabled':''} class="${locked?'':'primary'}" style="margin-top:9px;width:100%" onclick="complete('${m.id}')">${locked?'Need '+f+' ≥ '+m.req:'Complete Objective'}</button></div>`}).join('')}
 function renderCurrentPicker(){let el=document.getElementById('currentPicker');if(!el)return;el.innerHTML=contexts.map(x=>`<button class="${x[0]===s.current?'primary':''}" onclick="setCurrent('${x[0]}')">${x[0]}</button>`).join('')}
@@ -309,7 +325,7 @@ function toggleSettings(){let el=document.getElementById('settingsEdit');el.styl
 function renderLoadoutVerse(){let el=document.getElementById('loadoutVerse');if(!el)return;if(!s.settings.length){el.innerHTML='<div class="empty" style="margin-top:10px">Your loadout is empty. Tap Edit to choose what you are carrying today.</div>';return}let verses=s.settings.map(x=>loadoutVerses[x]).filter(Boolean);el.innerHTML=`<div class="loadoutVerse"><div class="homeSectionTitle">📖 LOADOUT SCRIPTURE</div>${verses.map(v=>`<div class="verseItem"><b>${esc(v.ref)}</b><div class="small" style="margin-top:4px">${esc(v.text)}</div></div>`).join('')}</div>`;}
 function toggleSetting(x){s.settings=s.settings.includes(x)?s.settings.filter(y=>y!==x):[...s.settings,x];save();document.getElementById('settingsEdit').style.display='block'}
 function newEncounter(){let e=encounters.find(x=>x.ctx===s.current);if(!e){alert('No encounter template for this context yet.');return}openEncounter(e)}
-function openEncounter(e){s.activeEncounter=e.id;document.getElementById('encounterTitle').textContent=e.name;document.getElementById('encounterName').value=e.name;document.getElementById('encounterType').textContent=e.type+' • '+e.ctx;document.getElementById('encounterDesc').textContent=e.desc;document.getElementById('encounterObjective').textContent=e.objective;document.getElementById('encounterPrimary').value='';document.getElementById('encounterSupport').value='';document.getElementById('encounterXP').value='25';document.getElementById('encounterFaith').value='0';document.getElementById('encounterHope').value='0';document.getElementById('encounterLove').value='0';document.getElementById('encounterError').style.display='none';document.getElementById('encounterModal').style.display='block'}
+function openEncounter(e){s.activeEncounter=e.id;document.getElementById('encounterTitle').textContent=e.name;document.getElementById('encounterName').value=e.name;document.getElementById('encounterType').textContent=e.type+' • '+e.ctx;document.getElementById('encounterDesc').textContent=e.desc;document.getElementById('encounterObjective').textContent=e.objective;document.getElementById('encounterPrimary').value='';document.getElementById('encounterSupport').value='';document.querySelectorAll('.encounterChoice').forEach(b=>b.classList.remove('selected'));document.getElementById('encounterXP').value='25';document.getElementById('encounterFaith').value='0';document.getElementById('encounterHope').value='0';document.getElementById('encounterLove').value='0';document.getElementById('encounterError').style.display='none';document.getElementById('encounterModal').style.display='block'}
 function closeEncounter(){s.activeEncounter=null;document.getElementById('encounterModal').style.display='none'}
 function completeEncounter(){
 let e=encounters.find(x=>x.id===s.activeEncounter);if(!e)return;
@@ -321,7 +337,6 @@ let xp=Math.max(0,Math.min(500,parseInt(document.getElementById('encounterXP').v
 let faith=Math.max(0,Math.min(10,parseInt(document.getElementById('encounterFaith').value,10)||0));
 let hope=Math.max(0,Math.min(10,parseInt(document.getElementById('encounterHope').value,10)||0));
 let love=Math.max(0,Math.min(10,parseInt(document.getElementById('encounterLove').value,10)||0));
-let support=document.getElementById('encounterSupport').value.trim();
 let before=s.level;
 s.xp+=xp;s.fhl.faith+=faith;s.fhl.hope+=hope;s.fhl.love+=love;
 while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}
@@ -345,6 +360,22 @@ if(s.level>before)s.history.unshift({type:'level',name:'Reached Level '+s.level,
 s.activeEncounter=null;save();
 document.getElementById('encounterModal').style.display='none';
 showFlowToast('🏆 VICTORY',''+encounterName+' • +'+xp+' XP');
+}
+function renderWorld(){
+let el=document.getElementById('worldStats');if(!el)return;
+let missionsDone=s.history.filter(h=>h.type==='mission').length;
+let encountersDone=s.history.filter(h=>h.type==='encounter').length;
+let excellence=s.excellence||0;
+let faith=s.fhl.faith||0,hope=s.fhl.hope||0,love=s.fhl.love||0;
+let total=Math.max(1,missionsDone+encountersDone+excellence);
+let state=missionsDone===0?'The world is waiting for your first move.':encountersDone===0?'Your actions are starting to build momentum.':excellence>0?'Your faithful actions are leaving a lasting mark.':'Your progress is beginning to change the landscape.';
+document.getElementById('worldtext').textContent=state;
+let cards=[['⚔️','Missions',missionsDone,Math.min(100,missionsDone*10)],['⚡','Encounters',encountersDone,Math.min(100,encountersDone*20)],['🏆','Excellence',excellence,Math.min(100,excellence*20)],['✝️','Faith / Hope / Love',faith+' / '+hope+' / '+love,Math.min(100,((faith+hope+love)/30)*100)]];
+el.innerHTML=cards.map(c=>`<div class="worldStat"><div class="row"><b>${c[0]} ${c[1]}</b><span class="small">${c[2]}</span></div><div class="worldBar"><div class="fill" style="width:${c[3]}%"></div></div></div>`).join('');
+}
+function chooseEncounterAction(btn,action){
+document.querySelectorAll('.encounterChoice').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
+let field=document.getElementById('encounterSupport');let existing=field.value.trim();field.value=existing&&existing!==action?existing+'\n'+action:action;field.focus();
 }
 function renderPowers(){s.powers=s.powers.filter(p=>p.until>Date.now());let el=document.getElementById('powers');el.innerHTML=s.powers.length?s.powers.map((p,i)=>`<button style="width:100%;text-align:left;margin:4px 0" onclick="showBlessing(${i})"><div class="row"><b>✨ ${esc(p.name)}</b><span class="small">${fmt(p.until-Date.now())}</span></div><div id="blessDetail${i}" class="small" style="display:none;margin-top:6px">Activated by: <b>${esc(p.activatedBy||'Unknown')}</b><br>Activated: ${new Date(p.activatedAt||Date.now()).toLocaleString()}</div></button>`).join(''):'<div class="empty">No active blessing. Complete objectives and keep moving faithfully.</div>'}
 function showBlessing(i){let el=document.getElementById('blessDetail'+i);if(el)el.style.display=el.style.display==='none'?'block':'none'}
