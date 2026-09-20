@@ -13,6 +13,9 @@
 <style>
 :root{--bg:#162a49;--panel:#21395f;--panel2:#29466f;--text:#fffdf2;--muted:#d4def0;--line:#5273a3;--accent:#ffd84d;--faith:#ffe36e;--hope:#8fc7ff;--love:#ff91b1;--good:#79e6aa}
 html[data-theme="velocity"]{--accent:#37c8ff;--faith:#67d9ff;--hope:#72a7ff;--love:#ff8fd0;--line:#3c75a0} html[data-theme="eclipse"]{--accent:#b98cff;--faith:#d3a8ff;--hope:#8eb7ff;--love:#ff9acb;--line:#7059a3} body{transition:background .25s ease,color .25s ease} html[data-theme="velocity"] body{background:radial-gradient(circle at 50% -10%,#22618a 0,#122f50 52%,#0b1e35 100%)} html[data-theme="eclipse"] body{background:radial-gradient(circle at 50% -10%,#57377f 0,#291d4d 52%,#15102b 100%)}
+
+.todayPair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.todayTile{margin:0;padding:13px;min-height:82px;text-align:left;background:#1a3153}.todayTile .tileLabel{font-size:11px;letter-spacing:1px;color:var(--muted);font-weight:800}.todayTile .tileValue{font-weight:850;margin-top:5px}.todayTile .tileHint{font-size:11px;color:var(--muted);margin-top:4px}.focusExpand{display:none;margin-top:10px}.focusExpand.open{display:block}.heroBlessings{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}.heroBlessings h3{font-size:14px}.heroBlessings #powers button{background:#172d4d}.heroWarzones{margin-top:10px}.currentTile{width:100%;text-align:left}.currentTile .currentPicker{margin-top:10px}@media(max-width:420px){.todayPair{gap:7px}.todayTile{padding:11px 9px}}
+
 .supportGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.supportField{background:#172d4d;border:1px solid var(--line);border-radius:12px;padding:9px}.supportField b{font-size:12px}.supportField textarea{min-height:74px;margin-top:7px}.warzoneMini{border-left:3px solid var(--accent);padding:11px 12px;background:#172d4d;border-radius:12px;margin-top:8px}.warzoneMini .status{font-size:11px;color:var(--good);font-weight:800}.settingsBox{border-top:1px solid var(--line);margin-top:18px;padding-top:18px}.themeChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.themeChoice{min-height:58px}.themeChoice.selected{outline:2px solid var(--accent);box-shadow:0 0 0 2px #0002}.historyControls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.filterRow{display:flex;gap:6px;overflow:auto;padding-bottom:4px;margin-top:10px}.filterRow .chip{white-space:nowrap}.supportPerson{border-left:3px solid var(--accent)}@media(max-width:600px){.supportGrid{grid-template-columns:1fr}.themeChoices{grid-template-columns:1fr}}
 *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -10%,#4774aa 0,#162a49 52%,#10213a 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
 button,input,textarea{font:inherit} button{color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:11px 14px;cursor:pointer}
@@ -160,44 +163,47 @@ input,textarea{font-size:16px}
 <div class="card heroCard">
   <div class="homeSectionTitle">🦸 HERO</div>
   <div class="heroTop"><div class="heroEmblem">✝</div><div><h2 id="heroTitle">Faithful Hero</h2><div class="small" id="heroSubtitle">Level 1 • Growing in Faith, Hope & Love</div></div></div>
-  <div class="row" style="margin-top:14px"><div><div class="sub">XP</div><div class="level" id="level">1</div></div><div style="text-align:right"><div class="small" id="xptext">0 / 100 XP</div><div class="small" id="heroFhl">FHL 3</div></div></div>
+  <div class="row" style="margin-top:14px"><div><div class="sub">LEVEL</div><div class="level" id="level">1</div></div><div style="text-align:right"><div class="small" id="xptext">0 / 100 XP</div><div class="small" id="heroFhl">FHL 3</div></div></div>
   <div class="xpbar"><div class="fill" id="xpfill"></div></div>
   <div class="fhl" id="fhl"></div>
   <div id="unlockBadges" class="unlockBadges"></div>
+  <div class="heroBlessings"><div class="row"><h3>✨ BLESSINGS</h3><span class="small">Active</span></div><div id="powers"></div></div>
 </div>
 
-<div class="card homeHomebase">
-  <div class="homeSectionTitle">🎯 TODAY'S FOCUS</div>
-  <div class="focus" style="margin-top:0"><button id="focusBtn" onclick="cycleFocus()">🎯 <b id="focusName">Choose today's focus</b><br><span class="small">Your primary expected resource</span></button></div>
+<div class="todayPair">
+  <div class="card todayTile">
+    <div class="tileLabel">🎯 TODAY'S FOCUS</div>
+    <button id="focusBtn" class="todayTile" style="padding:0;border:0;background:transparent;min-height:0" onclick="toggleFocusExpand()"><div class="tileValue" id="focusName">Choose today's focus</div><div class="tileHint">Tap to expand</div></button>
+    <div id="focusExpand" class="focusExpand"><div class="chips" id="focusChoices"></div></div>
+  </div>
+  <div class="card todayTile">
+    <div class="tileLabel">📍 CURRENT SETTING</div>
+    <button class="todayTile" style="padding:0;border:0;background:transparent;min-height:0" onclick="toggleCurrentPicker()"><div class="tileValue" id="current"></div><div class="tileHint">Tap to change</div></button>
+    <div id="currentPicker" class="currentPicker"></div>
+  </div>
 </div>
 
-<div class="card homeHomebase">
-  <div class="homeSectionTitle">📍 CURRENT SETTING</div>
-  <div class="homeCurrent"><div><div class="homeCurrentMain" id="current"></div><div class="homeCurrentSub" id="currentHint"></div></div><button onclick="toggleCurrentPicker()">Change</button></div>
-  <div id="currentPicker" class="currentPicker"></div>
-</div>
-
-<div class="card"><div class="row"><div><h2>⚔️ CURRENT WARZONES</h2><p class="small" style="margin-top:4px">What you're actively carrying into today.</p></div><button onclick="show('warzones',document.querySelector('.nav button:nth-child(3)'))">View</button></div><div id="hudWarzones"></div></div>
+<div class="card heroWarzones"><div class="row"><div><h2>⚔️ CURRENT WARZONES</h2><p class="small" style="margin-top:4px">What you're actively carrying into today.</p></div><button onclick="show('warzones',document.querySelector('.nav button:nth-child(3)'))">View</button></div><div id="hudWarzones"></div></div>
 
 <div class="card homeNext nextmove">
   <div class="homeSectionTitle">WHAT'S NEXT</div>
   <div class="row"><div><h2>➡️ NEXT MOVE</h2><div class="small" style="margin-top:4px">One clear thing to do from here.</div></div></div>
   <div id="nextMove"></div>
 </div>
-
-<div class="card"><h2>🛡️ BLESSINGS</h2><div id="powers"></div></div>
 </section>
 
 <section id="missionsView" class="view">
 <div class="card">
 <div class="row"><div><h2>📡 TODAY'S DISPATCH</h2><p class="small" style="margin-top:5px">Choose what you're stepping into.</p></div></div>
-<div class="homeSectionTitle" style="margin-top:16px">🎒 TODAY'S LOADOUT</div><div class="small" style="margin-top:5px">Your current setting and featured Scripture.</div>
-<div id="settings" style="margin-top:8px"></div><div id="settingsEdit" style="display:none"></div><button style="margin-top:9px" onclick="toggleSettings()">Edit Loadout</button><div id="loadoutVerse"></div>
+<div class="homeSectionTitle" style="margin-top:16px">🎯 TODAY'S SUBJECTS</div><div class="small" style="margin-top:5px">The subjects and situations you're carrying today.</div>
+<div id="settings" style="margin-top:8px"></div><div id="settingsEdit" style="display:none"></div><button style="margin-top:9px" onclick="toggleSettings()">Edit Subjects</button><div id="loadoutVerse"></div>
 </div>
 <div class="card"><h2>⚔️ MISSIONS</h2><p class="small" style="margin-top:5px">Available through your current setting and today's focus.</p><div id="allmissions"></div></div>
 <div class="card"><h2>🏆 WALK IN EXCELLENCE</h2><p class="small" style="margin:5px 0 12px">A repeatable standard you practice through real responsibilities.</p><div id="chain"></div></div>
-<div class="card"><div class="row"><div><h2>🤝 SUPPORT CIRCLE</h2><p class="small" style="margin-top:5px">Heroes you're carrying with you today.</p></div><button onclick="addSupportPerson()">+ Hero</button></div><div id="supportCircle"></div></div>
+<div class="card"><div class="row"><div><h2>🤝 SUPPORT CIRCLE</h2><p class="small" style="margin-top:5px">Heroes you're carrying with you today.</p></div><button onclick="toggleSupportAdd()">+ Hero</button></div><div id="supportAdd" style="display:none;margin-top:12px"><input id="newSupportName" maxlength="80" placeholder="Hero's name"><div class="actions"><button class="primary" onclick="saveNewSupportPerson()">Add Hero</button><button onclick="toggleSupportAdd()">Cancel</button></div></div><div id="supportCircle"></div></div>
 </section>
+
+<section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Your actions are shaping the world.</p><div id="worldStats" class="worldStats"></div></div></div></section>
 
 <section id="journal" class="view">
 <div class="card"><h2>📝 JOURNAL</h2><p class="small" style="margin:5px 0 12px">What are you thinking or talking to God about?</p>
@@ -206,12 +212,6 @@ input,textarea{font-size:16px}
 <div class="homeSectionTitle" style="margin-top:18px">📝 TODAY'S NOTES</div><textarea id="notesText" placeholder="What do you want to remember about today?"></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveNotes()">Save Notes</button>
 </div>
 </section>
-
-<section id="warzones" class="view">
-<div class="card"><div class="row"><div><h2>⚔️ WARZONES</h2><p class="small" style="margin-top:5px">What am I fighting?</p></div><button onclick="addWarzone()">+ Warzone</button></div><div id="warzoneList"></div></div>
-</section>
-
-<section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Your actions are shaping the world.</p><div id="worldStats" class="worldStats"></div></div></div></section>
 
 <section id="log" class="view"><div class="card"><div class="row"><div><h2>📜 HISTORY</h2><p class="small" style="margin-top:5px">Your recorded journey, newest first.</p></div><button onclick="clearHistoryView()">Refresh</button></div><div class="filterRow" id="historyFilters"></div><div class="historyControls"><button onclick="setHistorySort('newest')">Newest First</button><button onclick="setHistorySort('oldest')">Oldest First</button></div><div id="history"></div><div class="settingsBox"><div class="row"><div><h2>⚙️ SETTINGS</h2><p class="small" style="margin-top:4px">Customize Project Superhero on this device.</p></div></div><div class="small" style="margin-top:12px">THEME</div><div class="themeChoices" id="themeChoices"></div><button class="danger" style="width:100%;margin-top:14px" onclick="restartProject()">Restart Project Superhero</button></div></div></section>
 
@@ -256,8 +256,8 @@ input,textarea{font-size:16px}
 <button class="active" onclick="show('hud',this)">🏠<br>HUD</button>
 <button onclick="show('missionsView',this)">📡<br>Dispatch</button>
 <button onclick="show('warzones',this)">⚔️<br>Warzones</button>
-<button onclick="show('journal',this)">📝<br>Journal</button>
 <button onclick="show('world',this)">🌎<br>World</button>
+<button onclick="show('journal',this)">📝<br>Journal</button>
 <button onclick="show('log',this)">📜<br>History</button>
 </div></div>
 
@@ -311,9 +311,8 @@ document.getElementById('clock').textContent=new Date().toLocaleTimeString([], {
 document.getElementById('level').textContent=s.level;
 let need=s.level*100, pct=Math.min(100,s.xp/need*100); document.getElementById('xptext').textContent=`${s.xp} / ${need} XP`;document.getElementById('xpfill').style.width=pct+'%';
 document.getElementById('fhl').innerHTML=[['✝️','FAITH','faith'],['💙','HOPE','hope'],['❤️','LOVE','love']].map(([i,n,k])=>`<div class="stat"><b>${i} ${s.fhl[k]}</b><span>${n}</span></div>`).join('');
-let fb=document.getElementById('focusBtn');document.getElementById('focusName').textContent=s.focus?({faith:'FAITH',hope:'HOPE',love:'LOVE'}[s.focus]+' FOCUSED'):"Choose today's focus";fb.className=s.focus?'selected':'';
-document.getElementById('current').textContent=s.current;document.getElementById('currentHint').textContent='PS is using this as your present context.';
-renderCurrentPicker();
+let fb=document.getElementById('focusBtn');document.getElementById('focusName').textContent=s.focus?({faith:'FAITH',hope:'HOPE',love:'LOVE'}[s.focus]+' FOCUSED'):"Choose today's focus";if(fb)fb.className='todayTile';renderFocusChoices();
+document.getElementById('current').textContent=s.current;renderCurrentPicker();
 renderHero();
 renderNextMove();
 renderWarzones();renderSupportCircle();renderThemes();
@@ -328,8 +327,7 @@ function renderHero(){
  document.getElementById('heroTitle').textContent=title;
  document.getElementById('heroSubtitle').textContent=`${total} combined FHL • Excellence ${s.excellence||0}`;document.getElementById('heroFhl').textContent='FHL '+total;
  let max=Math.max(5,total+2);
- document.getElementById('heroStats').innerHTML=[['✝️','Faith','faith'],['💙','Hope','hope'],['❤️','Love','love']].map(([icon,n,k])=>{let v=s.fhl[k]||0;return `<div class="heroStat"><div class="statHead"><span>${icon} ${n}</span><span>${v}</span></div><div class="bar"><div style="width:${Math.min(100,v/max*100)}%"></div></div></div>`}).join('');
- let badges=[
+  let badges=[
   ['🌱','First Steps',total>=3],['⚔️','Encounter Ready',s.history.some(h=>h.type==='encounter')],['🏆','Excellence', (s.excellence||0)>=1],['🌟','Level 5',s.level>=5],['💎','FHL 10+',total>=10]
  ];
  document.getElementById('unlockBadges').innerHTML=badges.map(b=>`<span class="unlock ${b[2]?'':'locked'}">${b[0]} ${b[1]}${b[2]?'':' 🔒'}</span>`).join('');
@@ -342,7 +340,9 @@ function battleWarzone(i){let w=s.warzones[i];if(!w)return;let situation=prompt(
 function resolveWarzone(i){let w=s.warzones[i];if(!w)return;if(!confirm('Resolve this Warzone? You can reactivate it later.'))return;w.active=false;s.history.unshift({type:'warzone',name:'Resolved Warzone • '+w.name,time:new Date().toISOString(),day:today()});save();showFlowToast('🏁 WARZONE RESOLVED',w.name)}
 function reactivateWarzone(i){let w=s.warzones[i];if(!w)return;w.active=true;s.history.unshift({type:'warzone',name:'Reactivated Warzone • '+w.name,time:new Date().toISOString(),day:today()});save();showFlowToast('⚔️ WARZONE ACTIVE',w.name)}
 function renderSupportCircle(){let el=document.getElementById('supportCircle');if(!el)return;if(!s.people.length){el.innerHTML='<div class="empty" style="margin-top:10px">No heroes yet. Add someone you want to carry with you today.</div>';return}el.innerHTML=s.people.map((p,i)=>`<div class="card supportPerson" style="margin-top:12px"><div class="row"><div><h3>🦸 ${esc(p.name)}</h3><div class="small">Hero in your Support Circle</div></div><button onclick="removeSupportPerson(${i})">Remove</button></div><div class="supportGrid"><div class="supportField"><b>🙏 Prayer</b><textarea id="personPrayer${i}" placeholder="What are you praying for?"></textarea></div><div class="supportField"><b>🙌 Praise</b><textarea id="personPraise${i}" placeholder="What are you celebrating?"></textarea></div><div class="supportField"><b>🤝 Support</b><textarea id="personSupport${i}" placeholder="How can you show up?"></textarea></div></div><div class="actions" style="margin-top:9px"><button class="primary" onclick="saveSupportPerson(${i})">Save Update</button><button onclick="supportAction(${i},'prayer')">🙏 Pray</button><button onclick="supportAction(${i},'support')">🤝 Check In</button></div></div>`).join('');s.people.forEach((p,i)=>{document.getElementById('personPrayer'+i).value=p.prayer||'';document.getElementById('personPraise'+i).value=p.praise||'';document.getElementById('personSupport'+i).value=p.support||''})}
-function addSupportPerson(){let name=prompt('Hero name?');if(!name||!name.trim())return;s.people.push({id:'p-'+Date.now(),name:name.trim(),prayer:'',praise:'',support:''});save();showFlowToast('🤝 HERO ADDED',name.trim())}
+function toggleSupportAdd(){let el=document.getElementById('supportAdd');if(!el)return;let open=el.style.display==='none';el.style.display=open?'block':'none';if(open){let input=document.getElementById('newSupportName');if(input){input.value='';setTimeout(()=>input.focus(),50)}}}
+function saveNewSupportPerson(){let input=document.getElementById('newSupportName');let name=input?input.value.trim():'';if(!name){showFlowToast('🤝 NAME NEEDED','Give this hero a name first.');return}s.people.push({id:'p-'+Date.now(),name,prayer:'',praise:'',support:''});save();let el=document.getElementById('supportAdd');if(el)el.style.display='none';showFlowToast('🤝 HERO ADDED',name)}
+function addSupportPerson(){toggleSupportAdd()}
 function removeSupportPerson(i){if(!s.people[i])return;if(!confirm('Remove this hero from your Support Circle?'))return;let n=s.people[i].name;s.people.splice(i,1);save();showFlowToast('🤝 REMOVED',n)}
 function saveSupportPerson(i){let p=s.people[i];if(!p)return;p.prayer=document.getElementById('personPrayer'+i).value.trim();p.praise=document.getElementById('personPraise'+i).value.trim();p.support=document.getElementById('personSupport'+i).value.trim();s.history.unshift({type:'support',name:'Updated Support Circle • '+p.name,time:new Date().toISOString(),day:today(),person:p.name});save();showFlowToast('🤝 SUPPORT UPDATED',p.name)}
 function supportAction(i,type){let p=s.people[i];if(!p)return;let label=type==='prayer'?'🙏 Prayed for '+p.name:'🤝 Checked in with '+p.name;s.history.unshift({type:type==='prayer'?'prayer':'supportAction',name:label,time:new Date().toISOString(),day:today(),person:p.name});save();showFlowToast(type==='prayer'?'🙏 PRAYER RECORDED':'🤝 CHECK-IN RECORDED',p.name)}
@@ -352,7 +352,7 @@ function restartProject(){if(!confirm('This will erase your local PS data on thi
 function setHistorySort(sort){s.historySort=sort;save()}
 function setHistoryFilter(filter){s.historyFilter=filter;renderHistory()}
 
-function renderMissions(id,list){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No objectives here yet. Change Current to reveal more.</div>';return}el.innerHTML=list.map(m=>{let f=m.f?m.f.toUpperCase():'NONE',val=m.f?s.fhl[m.f]:999,locked=m.f&&val<m.req;return `<div class="card mission"><h3>${locked?'🔒 ':''}${esc(m.name)}</h3><div class="tag">${m.ctx} • ${m.f?f+' ≥ '+m.req:'OPEN'} ${m.f===s.focus?'• FOCUS BONUS':''}</div><p style="margin-top:7px">${esc(m.desc)}</p><div class="reward">+${m.xp} XP</div><button ${locked?'disabled':''} class="${locked?'':'primary'}" style="margin-top:9px;width:100%" onclick="complete('${m.id}')">${locked?'Need '+f+' ≥ '+m.req:'Complete Objective'}</button></div>`}).join('')}
+function renderMissions(id,list){let el=document.getElementById(id);if(!el)return;if(!list.length){el.innerHTML='<div class="empty">No objectives here yet. Change Current to reveal more.</div>';return}el.innerHTML=list.map(m=>{let f=m.f?m.f.toUpperCase():'NONE',val=m.f?s.fhl[m.f]:999,locked=m.f&&val<m.req;return `<div class="card mission"><h3>${locked?'🔒 ':''}${esc(m.name)}</h3><div class="tag">${m.ctx} • ${m.f?f+' ≥ '+m.req:'OPEN'} ${m.f===s.focus?'• FOCUS BONUS':''}</div><p style="margin-top:7px">${esc(m.desc)}</p><div class="reward">+${m.xp} XP</div><button ${locked?'disabled':''} class="${locked?'':'primary'}" style="margin-top:9px;width:100%" onclick="complete('${m.id}')">${locked?'Need '+f+' ≥ '+m.req:'Complete Objective'}</button></div>`}).join('')}
 function renderCurrentPicker(){let el=document.getElementById('currentPicker');if(!el)return;el.innerHTML=contexts.map(x=>`<button class="${x[0]===s.current?'primary':''}" onclick="setCurrent('${x[0]}')">${x[0]}</button>`).join('')}
 function toggleCurrentPicker(){let el=document.getElementById('currentPicker');if(el)el.classList.toggle('open')}
 function setCurrent(value){if(!contexts.some(x=>x[0]===value))return;s.current=value;save();let el=document.getElementById('currentPicker');if(el)el.classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})}
@@ -361,13 +361,16 @@ function showMissionsFromNext(){show('missionsView',document.querySelector('.nav
 function complete(id){let m=missions.find(x=>x.id===id);if(!m)return; if(m.f&&s.fhl[m.f]<m.req)return; s.xp+=m.xp;if(m.f)s.fhl[m.f]++;let before=s.level;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}s.history.unshift({type:'mission',name:m.name,time:new Date().toISOString(),xp:m.xp,day:today()});if(s.level>before)s.history.unshift({type:'level',name:`Reached Level ${s.level}`,time:new Date().toISOString()});if(Math.random()<.25){let bt=new Date().toISOString(),bl={name:'Faithful Strength',until:Date.now()+2*60*60*1000,activatedBy:m.name,activatedAt:bt};s.powers.unshift(bl);s.history.unshift({type:'blessing',name:bl.name,source:m.name,time:bt,until:bl.until});}if(id==='work-love'&&s.chain<2)s.chain=2;save();render();showFlowToast('✓ OBJECTIVE COMPLETE','+'+m.xp+' XP'+(m.f?' • '+m.f.toUpperCase()+' +1':''));let encounter=encounters.find(e=>e.triggerOn===id&&e.ctx===s.current);
 if(!encounter) encounter=encounters.find(e=>e.triggerOn===id);
 if(encounter&&s.activeEncounter===null)setTimeout(()=>openEncounter(encounter),500)}
+function renderFocusChoices(){let el=document.getElementById('focusChoices');if(!el)return;let a=[['faith','✝️ FAITH'],['hope','💙 HOPE'],['love','❤️ LOVE']];el.innerHTML=a.map(([k,label])=>`<button class="chip ${s.focus===k?'on':''}" onclick="setFocus('${k}')">${label}</button>`).join('')}
+function toggleFocusExpand(){let el=document.getElementById('focusExpand');if(el)el.classList.toggle('open')}
+function setFocus(k){if(!['faith','hope','love'].includes(k))return;s.focus=k;save();let el=document.getElementById('focusExpand');if(el)el.classList.add('open');showFlowToast('🎯 FOCUS SET',k.toUpperCase())}
 function cycleFocus(){let a=['faith','hope','love'];let i=s.focus? a.indexOf(s.focus):-1;s.focus=a[(i+1)%3];save()}
 function cycleCurrent(){let i=contexts.findIndex(x=>x[0]===s.current);s.current=contexts[(i+1)%contexts.length][0];save()}
 let toastTimer=null;
 function showFlowToast(title,detail){let el=document.getElementById('flowToast');if(!el)return;el.innerHTML=`<b>${esc(title)}</b><div class="small" style="margin-top:3px">${esc(detail||'')}</div>`;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
 function toggleSettings(){let el=document.getElementById('settingsEdit');el.style.display=el.style.display==='none'?'block':'none';el.innerHTML=settingOptions.map(x=>`<button class="chip ${s.settings.includes(x)?'on':''}" onclick="toggleSetting('${x}')">${x}</button>`).join('')}
-function renderLoadoutVerse(){let el=document.getElementById('loadoutVerse');if(!el)return;if(!s.settings.length){el.innerHTML='<div class="empty" style="margin-top:10px">Your loadout is empty. Tap Edit to choose what you are carrying today.</div>';return}let verses=s.settings.map(x=>loadoutVerses[x]).filter(Boolean);el.innerHTML=`<div class="loadoutVerse"><div class="homeSectionTitle">📖 LOADOUT SCRIPTURE</div>${verses.map(v=>`<div class="verseItem"><b>${esc(v.ref)}</b><div class="small" style="margin-top:4px">${esc(v.text)}</div></div>`).join('')}</div>`;}
-function toggleSetting(x){s.settings=s.settings.includes(x)?s.settings.filter(y=>y!==x):[...s.settings,x];save();document.getElementById('settingsEdit').style.display='block'}
+function renderLoadoutVerse(){let el=document.getElementById('loadoutVerse');if(!el)return;if(!s.settings.length){el.innerHTML='<div class="empty" style="margin-top:10px">No subjects selected yet. Tap Edit Subjects to choose what you are carrying today.</div>';return}let verses=s.settings.map(x=>loadoutVerses[x]).filter(Boolean);el.innerHTML=`<div class="loadoutVerse"><div class="homeSectionTitle">📖 SUBJECT SCRIPTURE</div>${verses.map(v=>`<div class="verseItem"><b>${esc(v.ref)}</b><div class="small" style="margin-top:4px">${esc(v.text)}</div></div>`).join('')}</div>`;}
+function toggleSetting(x){s.settings=s.settings.includes(x)?s.settings.filter(y=>y!==x):[...s.settings,x];save();let el=document.getElementById('settingsEdit');if(el)el.style.display='block';showFlowToast('🎯 SUBJECT UPDATED',x)}
 function newEncounter(){let e=encounters.find(x=>x.ctx===s.current);if(!e){alert('No encounter template for this context yet.');return}openEncounter(e)}
 function openEncounter(e){s.activeEncounter=e.id;document.getElementById('encounterTitle').textContent=e.name;document.getElementById('encounterName').value=e.name;document.getElementById('encounterType').textContent=e.type+' • '+e.ctx;document.getElementById('encounterDesc').textContent=e.desc;document.getElementById('encounterObjective').textContent=e.objective;document.getElementById('encounterPrimary').value='';document.getElementById('encounterSupport').value='';document.querySelectorAll('.encounterChoice').forEach(b=>b.classList.remove('selected'));document.getElementById('encounterXP').value='25';document.getElementById('encounterFaith').value='0';document.getElementById('encounterHope').value='0';document.getElementById('encounterLove').value='0';document.getElementById('encounterError').style.display='none';document.getElementById('encounterModal').style.display='block'}
 function closeEncounter(){s.activeEncounter=null;document.getElementById('encounterModal').style.display='none'}
