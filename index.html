@@ -203,6 +203,14 @@ input,textarea{font-size:16px}
 <div class="card"><div class="row"><div><h2>🤝 SUPPORT CIRCLE</h2><p class="small" style="margin-top:5px">Heroes you're carrying with you today.</p></div><button onclick="toggleSupportAdd()">+ Hero</button></div><div id="supportAdd" style="display:none;margin-top:12px"><input id="newSupportName" maxlength="80" placeholder="Hero's name"><div class="actions"><button class="primary" onclick="saveNewSupportPerson()">Add Hero</button><button onclick="toggleSupportAdd()">Cancel</button></div></div><div id="supportCircle"></div></div>
 </section>
 
+<section id="warzones" class="view">
+<div class="card">
+<div class="row"><div><h2>⚔️ WARZONES</h2><p class="small" style="margin-top:5px">What are you fighting, resisting, or learning to overcome?</p></div><button class="primary" onclick="addWarzone()">+ Add Warzone</button></div>
+<div class="small" style="margin-top:12px">Warzones are persistent. Discover the trigger, recognize the pattern, learn the counters, and record what happened.</div>
+</div>
+<div id="warzoneList"></div>
+</section>
+
 <section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Your actions are shaping the world.</p><div id="worldStats" class="worldStats"></div></div></div></section>
 
 <section id="journal" class="view">
