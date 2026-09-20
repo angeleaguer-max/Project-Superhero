@@ -48,6 +48,7 @@ input,textarea{font-size:16px}
 .chip{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 #encounterModal{padding-top:max(18px,env(safe-area-inset-top));padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 #encounterModal .card{padding:16px}
+@media (max-width:420px){.nav button{font-size:9px;padding-left:2px;padding-right:2px}}
 @media (max-width:380px){
   .app{padding-left:10px;padding-right:10px}
   .card{border-radius:17px;padding:13px}
@@ -135,6 +136,11 @@ input,textarea{font-size:16px}
 .heroCard{border-color:#5e7eaa}.heroTop{display:flex;align-items:center;gap:14px}.heroEmblem{width:58px;height:58px;border-radius:18px;background:var(--accent);color:#162a49;display:grid;place-items:center;font-size:30px;font-weight:900;box-shadow:0 8px 22px #0004}.heroTop h2{margin:0}.heroStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.heroStat{background:#172d4d;border:1px solid var(--line);border-radius:12px;padding:9px}.heroStat .statHead{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.heroStat .bar{height:7px;background:#0f2038;border-radius:999px;overflow:hidden;margin-top:6px}.heroStat .bar div{height:100%;width:0;background:var(--accent);border-radius:999px}.unlockBadges{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.unlock{border:1px solid var(--line);background:#172d4d;border-radius:999px;padding:6px 9px;font-size:12px}.unlock.locked{opacity:.45}.world{transition:transform .25s ease,box-shadow .25s ease}.world.level1{box-shadow:0 0 28px #ffffff0a}.world.level2{box-shadow:0 0 34px #79e6aa18}.world.level3{box-shadow:0 0 42px #ffd84d22}.world.level4{box-shadow:0 0 52px #ffd84d38;transform:translateY(-1px)}.worldStage{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin:16px 0 10px;background:#172d4d;border:1px solid var(--line);border-radius:12px}.world.level1{}.world.level2{}.world.level3{}.world.level4{}
 .encounterChoice.selected{border-color:var(--accent);box-shadow:0 0 0 2px #ffd84d33 inset}
 @media(max-width:520px){.heroStats{grid-template-columns:1fr}.heroEmblem{width:50px;height:50px}}
+
+/* Project Superhero structure pass */
+.sectionIntro{margin-top:5px;color:var(--muted);font-size:13px;line-height:1.45}
+.warzoneCard{border-color:#6b8fbe}.warzoneStatus{font-size:11px;letter-spacing:.8px;font-weight:800;padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:#172d4d}.warzoneStatus.active{border-color:#65c894;background:#176342}.warzoneStatus.resolved{opacity:.7}.intelGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.intelBox{padding:10px;border:1px solid var(--line);border-radius:13px;background:#172d4d}.intelBox b{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.counterList{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.counter{display:inline-flex;align-items:center;min-height:36px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:#1a3153;font-size:13px}.battleHistory{margin-top:12px}.battleItem{padding:10px 0;border-top:1px solid rgba(255,255,255,.1)}.battleItem:first-child{border-top:0}.filterRow{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.filterRow button{min-height:40px;padding:8px 10px;font-size:12px}.filterRow button.on{background:var(--accent);color:#17243a;font-weight:800}.sortRow{display:flex;justify-content:flex-end;gap:7px;margin-top:8px}.sortRow button{min-height:38px;font-size:12px}.journalSection textarea{min-height:120px}.settingsPanel{display:grid;gap:10px}.dangerButton{border-color:#b86a6a;background:#542b36}.settingsHint{padding:10px;border-radius:12px;background:#172d4d;border:1px solid var(--line)}
+@media(max-width:520px){.intelGrid{grid-template-columns:1fr}.filterRow{gap:6px}}
 </style>
 </head>
 <body>
@@ -190,34 +196,62 @@ input,textarea{font-size:16px}
   <div id="nextMove"></div>
 </div>
 
-<div class="card"><div class="row"><h2>⚔️ ACTIVE OBJECTIVES</h2><button onclick="newEncounter()">⚡ Encounter</button></div><div id="missions"></div></div>
+<div class="card warzoneCard"><div class="row"><div><h2>⚔️ CURRENT WARZONE</h2><div class="small" style="margin-top:5px">Face what is active without cluttering the HUD.</div></div><button onclick="openWarzoneBattle(s.warzones.find(w=>w.status==='active')?.id)">Enter</button></div><div id="hudWarzone"></div></div>
 
 <div class="card"><h2>🛡️ BLESSINGS</h2><div id="powers"></div></div>
-
-<div class="card"><h2>⚔️ WALK IN EXCELLENCE</h2><div id="chain"></div></div>
 </section>
 
 <section id="missionsView" class="view">
 <div class="card">
-<div class="row"><div><h2>🎒 TODAY'S LOADOUT</h2><p class="small" style="margin-top:5px">Choose what you are carrying into today. Each setting brings its own preset Scripture.</p></div><button onclick="toggleSettings()">Edit</button></div>
+<div class="row"><div><h2>📡 TODAY'S DISPATCH</h2><p class="sectionIntro">Choose what you're stepping into.</p></div><button onclick="toggleSettings()">Edit Loadout</button></div>
 <div id="settings"></div><div id="settingsEdit" style="display:none"></div><div id="loadoutVerse"></div>
 </div>
-<div class="card"><h2>⚔️ Missions</h2><p class="small" style="margin-top:5px">Available through your current setting and today's focus.</p><div id="allmissions"></div></div>
+<div class="card"><h2>⚔️ AVAILABLE ACTIONS</h2><p class="sectionIntro">Current-context missions available through today's setting and focus.</p><div id="allmissions"></div></div>
+<div class="card"><h2>🏆 WALK IN EXCELLENCE</h2><p class="sectionIntro">A repeatable growth mechanic practiced through real responsibilities.</p><div id="chain"></div></div>
 </section>
 
-<section id="notes" class="view">
-<div class="card"><h2>📝 Today’s Notes</h2><p class="small" style="margin:5px 0 12px">Notes about today’s loadout. Saved with today’s run.</p><textarea id="notesText" placeholder="What do you want to remember about today’s loadout?"></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveNotes()">Save Notes</button></div>
+<section id="warzones" class="view">
+<div class="card"><div class="row"><div><h2>⚔️ WARZONES</h2><p class="sectionIntro">What am I fighting? Track pressure, discover patterns, and record faithful responses.</p></div><button class="primary" onclick="openWarzoneEditor()">＋ Add Warzone</button></div><div id="warzonesList"></div></div>
 </section>
 
 <section id="journal" class="view">
-<div class="card"><h2>🙏 Prayer</h2><p class="small" style="margin:5px 0 12px">Write it. Save it. Timestamp it.</p><textarea id="prayerText" placeholder="Prayer..."></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveJournal('prayer')">Save Prayer</button></div>
-<div class="card"><h2>🎵 Praise</h2><p class="small" style="margin:5px 0 12px">Write it. Save it. Timestamp it.</p><textarea id="praiseText" placeholder="Praise..."></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveJournal('praise')">Save Praise</button></div>
+<div class="card journalSection"><h2>🙏 Prayer</h2><p class="small" style="margin:5px 0 12px">Write it. Save it. Timestamp it in History.</p><textarea id="prayerText" placeholder="Prayer..."></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveJournal('prayer')">Save Prayer</button></div>
+<div class="card journalSection"><h2>🙌 Praise</h2><p class="small" style="margin:5px 0 12px">Record what you're thankful for. It will be timestamped in History.</p><textarea id="praiseText" placeholder="Praise..."></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveJournal('praise')">Save Praise</button></div>
+<div class="card journalSection"><h2>📝 Today's Notes</h2><p class="small" style="margin:5px 0 12px">Notes about today's run. Saved with today and preserved in History.</p><textarea id="notesText" placeholder="What do you want to remember about today?"></textarea><button class="primary" style="margin-top:8px;width:100%" onclick="saveNotes()">Save Notes</button></div>
 </section>
 
-<section id="log" class="view"><div class="card"><div class="row"><div><h2>📜 History</h2><p class="small" style="margin-top:5px">Your recorded journey, day by day.</p></div><button onclick="clearHistoryView()">Refresh</button></div><div id="history"></div></div></section>
+<section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Your actions are shaping the world.</p><div id="worldStats" class="worldStats"></div><div class="card settingsPanel" style="margin-top:18px;text-align:left"><div><h2>⚙️ Settings</h2><p class="small" style="margin-top:5px">Useful app controls stay here so the main navigation stays focused.</p></div><div class="settingsHint"><b>Local data</b><div class="small" style="margin-top:4px">Your PS progress is stored on this device using localStorage.</div></div><button class="dangerButton" onclick="restartProjectSuperhero()">🔄 Restart Project Superhero</button></div></div></div></section>
 
-<section id="world" class="view"><div class="card world"><div><div class="orb"><div><b>✝</b><br><span class="small">SPIRIT ONLINE</span></div></div><h1 style="margin-top:20px">PROJECT SUPERHERO</h1><p id="worldtext">Your actions are shaping the world.</p><div id="worldStats" class="worldStats"></div></div></div></section>
+<section id="log" class="view"><div class="card"><div class="row"><div><h2>📜 History</h2><p class="small" style="margin-top:5px">Review what happened without turning the page into one giant wall.</p></div></div><div class="filterRow" id="historyFilters"></div><div class="sortRow" id="historySort"></div><div id="history"></div></div></section>
 </div>
+
+<div id="warzoneModal" style="display:none;position:fixed;inset:0;background:#071426E8;z-index:21;padding:18px;overflow:auto">
+<div style="max-width:650px;margin:25px auto"><div class="card" style="border-color:var(--accent);box-shadow:0 0 45px #0008">
+<div class="small">⚔️ WARZONE INTEL</div><h1 id="warzoneModalTitle" style="margin-top:6px">Warzone</h1>
+<input id="warzoneId" type="hidden">
+<div class="small" style="margin-top:12px">NAME</div><input id="warzoneName" maxlength="100" placeholder="Financial Pressure">
+<div class="intelGrid">
+<label class="intelBox"><b>STATUS</b><select id="warzoneStatus" style="width:100%;background:#132845;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px"><option value="active">Active</option><option value="resolved">Resolved</option></select></label>
+<label class="intelBox"><b>TRIGGER</b><input id="warzoneTrigger" maxlength="200" placeholder="Unknown / discovering"></label>
+<label class="intelBox"><b>PATTERN</b><input id="warzonePattern" maxlength="200" placeholder="Unknown / discovering"></label>
+<label class="intelBox"><b>KNOWN COUNTERS</b><input id="warzoneCounters" maxlength="300" placeholder="Faith, Wisdom"></label>
+</div>
+<div class="small" style="margin-top:12px">🧠 NOTES / INTEL</div><textarea id="warzoneNotes" style="min-height:100px;margin-top:8px" placeholder="What are you learning about this warzone?"></textarea>
+<div class="actions"><button class="primary" style="flex:1" onclick="saveWarzoneEditor()">Save Intel</button><button onclick="closeWarzoneModal()">Close</button></div>
+</div></div></div>
+
+<div id="battleModal" style="display:none;position:fixed;inset:0;background:#071426E8;z-index:22;padding:18px;overflow:auto">
+<div style="max-width:650px;margin:25px auto"><div class="card" style="border-color:var(--accent);box-shadow:0 0 45px #0008">
+<div class="small">⚔️ ENTER WARZONE</div><h1 id="battleModalTitle" style="margin-top:6px">Battle</h1><input id="battleWarzoneId" type="hidden">
+<p id="battleIntel" class="sectionIntro"></p>
+<div class="small" style="margin-top:14px">WHAT HAPPENED?</div><textarea id="battleSituation" style="min-height:90px;margin-top:8px" placeholder="Describe what happened."></textarea>
+<div class="small" style="margin-top:12px">COUNTER / RESPONSE USED</div><input id="battleCounter" list="counterOptions" maxlength="120" placeholder="Faith, Wisdom, etc."><datalist id="counterOptions"></datalist>
+<div class="small" style="margin-top:12px">📖 SCRIPTURE THAT GUIDED THE RESPONSE</div><textarea id="battleScripture" style="min-height:80px;margin-top:8px" placeholder="Verse, passage, or Scripture principle."></textarea>
+<div class="small" style="margin-top:12px">PRACTICAL ACTION TAKEN</div><textarea id="battleAction" style="min-height:80px;margin-top:8px" placeholder="What did you actually do?"></textarea>
+<div class="small" style="margin-top:12px">RESULT / LESSON LEARNED</div><textarea id="battleResult" style="min-height:80px;margin-top:8px" placeholder="What happened next? What did you learn?"></textarea>
+<div class="small" style="margin-top:12px">NEW COUNTER DISCOVERED? (optional)</div><input id="battleNewCounter" maxlength="80" placeholder="Add a counter you discovered">
+<div class="actions"><button class="primary" style="flex:1" onclick="saveWarzoneBattle()">⚔️ Record Battle</button><button onclick="closeBattleModal()">Close</button></div>
+</div></div></div>
 
 <div id="encounterModal" style="display:none;position:fixed;inset:0;background:#071426E8;z-index:20;padding:18px;overflow:auto">
 <div style="max-width:650px;margin:25px auto">
@@ -256,18 +290,36 @@ input,textarea{font-size:16px}
 
 <div id="flowToast" class="flowToast"></div>
 
-<div class="nav"><div class="navin">
+<div class="nav"><div class="navin" style="grid-template-columns:repeat(6,1fr)">
 <button class="active" onclick="show('hud',this)">🏠<br>HUD</button>
-<button onclick="show('missionsView',this)">⚔️<br>Missions</button>
-<button onclick="show('notes',this)">📝<br>Notes</button>
-<button onclick="show('log',this)">📜<br>Log</button>
-<button onclick="show('world',this)">🌌<br>World</button>
+<button onclick="show('missionsView',this)">📡<br>Dispatch</button>
+<button onclick="show('warzones',this)">⚔️<br>Warzones</button>
+<button onclick="show('journal',this)">📝<br>Journal</button>
+<button onclick="show('world',this)">🌎<br>World</button>
+<button onclick="show('log',this)">📜<br>History</button>
 </div></div>
 
 <script>
 const KEY='ps_v01';
-const defaultState={xp:0,level:1,fhl:{faith:1,hope:1,love:1},focus:null,current:'🏠 HOME',settings:[],history:[],powers:[],chain:0,excellence:0,notes:'',activeEncounter:null,lastDate:new Date().toISOString().slice(0,10)};
-let s=JSON.parse(localStorage.getItem(KEY)||'null')||defaultState;
+const defaultState={xp:0,level:1,fhl:{faith:1,hope:1,love:1},focus:null,current:'🏠 HOME',settings:[],history:[],powers:[],chain:0,excellence:0,notes:'',activeEncounter:null,lastDate:new Date().toISOString().slice(0,10),warzones:[],historyFilter:'all',historySort:'newest'};
+const storedState=JSON.parse(localStorage.getItem(KEY)||'null');
+function migrateState(raw){
+  const base=JSON.parse(JSON.stringify(defaultState));
+  const incoming=raw&&typeof raw==='object'?raw:{};
+  const merged={...base,...incoming};
+  merged.fhl={...base.fhl,...(incoming.fhl||{})};
+  merged.history=Array.isArray(incoming.history)?incoming.history:[];
+  merged.powers=Array.isArray(incoming.powers)?incoming.powers:[];
+  merged.settings=Array.isArray(incoming.settings)?incoming.settings:[];
+  merged.warzones=Array.isArray(incoming.warzones)?incoming.warzones:[];
+  merged.historyFilter=incoming.historyFilter||'all';
+  merged.historySort=incoming.historySort||'newest';
+  if(!merged.warzones.length){merged.warzones=[{id:'financial-pressure',name:'Financial Pressure',status:'active',trigger:'Unknown / discovering',pattern:'Unknown / discovering',counters:['Faith','Wisdom','Diligence','Contentment'],notes:'',battles:[],createdAt:new Date().toISOString()}];}
+  merged.warzones=merged.warzones.map(w=>({...w,status:w.status||'active',trigger:w.trigger||'Unknown / discovering',pattern:w.pattern||'Unknown / discovering',counters:Array.isArray(w.counters)?w.counters:[],notes:w.notes||'',battles:Array.isArray(w.battles)?w.battles:[]}));
+  return merged;
+}
+let s=migrateState(storedState);
+if(!storedState||JSON.stringify(storedState)!==JSON.stringify(s))localStorage.setItem(KEY,JSON.stringify(s));
 const contexts=[['🏠 HOME','Home'],['🏢 WORK','Work'],['🚗 TRAVEL','Travel'],['⛪ CHURCH','Church'],['👥 PEOPLE','People'],['🧹 CHORES','Chores'],['😴 REST','Rest']];
 const settingOptions=['🏢 WORK','🏠 HOME','👥 PEOPLE','🧹 CHORES','🚗 TRAVEL','⛪ CHURCH','📖 BIBLE','🙏 PRAYER','😴 REST'];
 const loadoutVerses={
@@ -301,7 +353,7 @@ const encounters=[
 ];
 function save(){localStorage.setItem(KEY,JSON.stringify(s));render()}
 function today(){return new Date().toISOString().slice(0,10)}
-function resetIfNeeded(){if(s.lastDate!==today()){s.lastDate=today();s.focus=null;s.settings=[];s.powers=[];s.chain=0;s.notes='';s.history.unshift({type:'day',name:'🌅 New daily run started',time:new Date().toISOString()});save()}}
+function resetIfNeeded(){if(s.lastDate!==today()){s.lastDate=today();s.focus=null;s.settings=[];s.powers=[];s.chain=0;s.notes='';s.activeEncounter=null;s.history.unshift({type:'day',name:'🌅 New daily run started',time:new Date().toISOString(),day:today()});localStorage.setItem(KEY,JSON.stringify(s));}}
 function esc(x){return String(x).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function render(){
 let hd=document.getElementById('homeDate');if(hd)hd.textContent='Your run for '+new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
@@ -317,8 +369,8 @@ renderHero();
 renderNextMove();
 document.getElementById('settings').innerHTML=s.settings.length?s.settings.map(x=>`<span class="chip on">${x}</span>`).join(''):'<span class="small">No featured settings yet.</span>';
 renderLoadoutVerse();
-let available=missions.filter(m=>m.ctx===s.current).sort((a,b)=>(b.f===s.focus)-(a.f===s.focus));renderMissions('missions',available.slice(0,4));renderMissions('allmissions',missions.filter(m=>m.ctx===s.current));
-document.getElementById('notesText').value=s.notes||'';renderPowers();renderChain();renderHistory();renderWorld();
+renderMissions('allmissions',missions.filter(m=>m.ctx===s.current));
+document.getElementById('notesText').value=s.notes||'';renderPowers();renderChain();renderHistory();renderWorld();renderWarzoneUI();
 }
 function renderHero(){
  let total=(s.fhl.faith||0)+(s.fhl.hope||0)+(s.fhl.love||0);
@@ -411,6 +463,22 @@ function chooseEncounterAction(btn,action){
 document.querySelectorAll('.encounterChoice').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
 let field=document.getElementById('encounterSupport');let existing=field.value.trim();if(!existing)field.value=action;else if(!existing.split('\n').includes(action))field.value=existing+'\n'+action;field.focus();
 }
+
+function renderWarzoneUI(){
+ let hud=document.getElementById('hudWarzone');let list=document.getElementById('warzonesList');
+ let active=s.warzones.filter(w=>w.status==='active');
+ if(hud){if(!active.length)hud.innerHTML='<div class="empty">No active Warzone. Enter Warzones to review resolved battles or add one.</div>';else{let w=active[0];hud.innerHTML=`<div class="row"><div><b>${esc(w.name)}</b><div class="small" style="margin-top:4px">Trigger: ${esc(w.trigger||'Unknown / discovering')}</div></div><span class="warzoneStatus active">ACTIVE</span></div><div class="counterList">${w.counters.map(c=>`<span class="counter">${esc(c)}</span>`).join('')}</div><button class="primary" style="margin-top:10px;width:100%" onclick="openWarzoneBattle('${w.id}')">⚔️ Enter ${esc(w.name)}</button>`}}
+ if(list){if(!s.warzones.length){list.innerHTML='<div class="empty">No Warzones yet. Add the first one.</div>';return}list.innerHTML=s.warzones.map(w=>`<div class="card warzoneCard"><div class="row"><div><h3>${esc(w.name)}</h3><div class="small" style="margin-top:4px">${w.battles.length} battle${w.battles.length===1?'':'s'} recorded</div></div><span class="warzoneStatus ${w.status}">${w.status.toUpperCase()}</span></div><div class="intelGrid"><div class="intelBox"><b>TRIGGER</b>${esc(w.trigger||'Unknown / discovering')}</div><div class="intelBox"><b>PATTERN</b>${esc(w.pattern||'Unknown / discovering')}</div></div><div class="intelBox" style="margin-top:9px"><b>KNOWN COUNTERS</b><div class="counterList">${w.counters.length?w.counters.map(c=>`<span class="counter">${esc(c)}</span>`).join(''):'<span class="small">None discovered yet.</span>'}</div></div>${w.notes?`<div class="small" style="margin-top:9px"><b>Intel:</b> ${esc(w.notes)}</div>`:''}<div class="actions"><button class="primary" onclick="openWarzoneBattle('${w.id}')">⚔️ Battle</button><button onclick="openWarzoneEditor('${w.id}')">Edit Intel</button>${w.status==='active'?`<button onclick="resolveWarzone('${w.id}')">Resolve</button>`:'<button onclick="reopenWarzone(\''+w.id+'\')">Reactivate</button>'}</div>${renderBattleHistoryHTML(w)}</div>`).join('')}}
+function renderBattleHistoryHTML(w){if(!w.battles.length)return '';return `<div class="battleHistory"><div class="homeSectionTitle">BATTLE HISTORY</div>${w.battles.slice().reverse().map((b,i)=>`<div class="battleItem"><b>${new Date(b.time).toLocaleString()}</b><div class="small" style="margin-top:4px"><b>What happened:</b> ${esc(b.situation)}</div><div class="small" style="margin-top:3px"><b>Counter:</b> ${esc(b.counter||'Not recorded')}</div><details style="margin-top:6px"><summary class="small">View battle details</summary><div class="small" style="margin-top:6px"><b>Scripture:</b> ${esc(b.scripture||'Not recorded')}<br><b>Action:</b> ${esc(b.action||'Not recorded')}<br><b>Result / lesson:</b> ${esc(b.result||'Not recorded')}</div></details></div>`).join('')}</div>`}
+function openWarzoneEditor(id){let w=id?s.warzones.find(x=>x.id===id):null;document.getElementById('warzoneModalTitle').textContent=w?'Edit Warzone':'Add Warzone';document.getElementById('warzoneId').value=w?w.id:'';document.getElementById('warzoneName').value=w?w.name:'';document.getElementById('warzoneStatus').value=w?w.status:'active';document.getElementById('warzoneTrigger').value=w?w.trigger:'';document.getElementById('warzonePattern').value=w?w.pattern:'';document.getElementById('warzoneCounters').value=w?w.counters.join(', '):'';document.getElementById('warzoneNotes').value=w?w.notes:'';document.getElementById('warzoneModal').style.display='block'}
+function closeWarzoneModal(){document.getElementById('warzoneModal').style.display='none'}
+function saveWarzoneEditor(){let id=document.getElementById('warzoneId').value.trim();let name=document.getElementById('warzoneName').value.trim();if(!name){alert('Give the Warzone a name first.');return}let counters=document.getElementById('warzoneCounters').value.split(',').map(x=>x.trim()).filter(Boolean);let w=id?s.warzones.find(x=>x.id===id):null;if(!w){id='warzone-'+Date.now();w={id,name,status:'active',trigger:'Unknown / discovering',pattern:'Unknown / discovering',counters:[],notes:'',battles:[],createdAt:new Date().toISOString()};s.warzones.push(w);s.history.unshift({type:'warzone',name:'⚔️ Warzone created • '+name,time:new Date().toISOString(),day:today()})}Object.assign(w,{name,status:document.getElementById('warzoneStatus').value,trigger:document.getElementById('warzoneTrigger').value.trim()||'Unknown / discovering',pattern:document.getElementById('warzonePattern').value.trim()||'Unknown / discovering',counters,notes:document.getElementById('warzoneNotes').value.trim()});save();closeWarzoneModal();showFlowToast('⚔️ WARZONE UPDATED',name)}
+function openWarzoneBattle(id){let w=s.warzones.find(x=>x.id===id);if(!w){alert('Choose a Warzone first.');return}if(w.status==='resolved'){if(!confirm('This Warzone is resolved. Enter it again?'))return}document.getElementById('battleWarzoneId').value=w.id;document.getElementById('battleModalTitle').textContent=w.name;document.getElementById('battleIntel').innerHTML=`<b>Trigger:</b> ${esc(w.trigger||'Unknown / discovering')}<br><b>Pattern:</b> ${esc(w.pattern||'Unknown / discovering')}<br><b>Counters:</b> ${w.counters.length?w.counters.map(c=>esc(c)).join(' • '):'None discovered yet.'}`;document.getElementById('counterOptions').innerHTML=w.counters.map(c=>`<option value="${esc(c)}"></option>`).join('');['battleSituation','battleCounter','battleScripture','battleAction','battleResult','battleNewCounter'].forEach(id=>document.getElementById(id).value='');document.getElementById('battleModal').style.display='block'}
+function closeBattleModal(){document.getElementById('battleModal').style.display='none'}
+function saveWarzoneBattle(){let w=s.warzones.find(x=>x.id===document.getElementById('battleWarzoneId').value);if(!w)return;let situation=document.getElementById('battleSituation').value.trim();if(!situation){alert('Record what happened before saving the battle.');return}let counter=document.getElementById('battleCounter').value.trim();let newCounter=document.getElementById('battleNewCounter').value.trim();if(newCounter&&!w.counters.some(c=>c.toLowerCase()===newCounter.toLowerCase()))w.counters.push(newCounter);if(newCounter&&!counter)counter=newCounter;let battle={time:new Date().toISOString(),situation,counter,scripture:document.getElementById('battleScripture').value.trim(),action:document.getElementById('battleAction').value.trim(),result:document.getElementById('battleResult').value.trim()};w.battles.push(battle);s.history.unshift({type:'warzone',name:'⚔️ Battle • '+w.name,time:battle.time,day:today(),warzoneId:w.id,warzoneName:w.name,situation:battle.situation,counter:battle.counter,scripture:battle.scripture,action:battle.action,result:battle.result});save();closeBattleModal();showFlowToast('⚔️ BATTLE RECORDED','Your response was added to History')}
+function resolveWarzone(id){let w=s.warzones.find(x=>x.id===id);if(!w)return;if(!confirm('Resolve this Warzone? You can reactivate it later.'))return;w.status='resolved';s.history.unshift({type:'warzone',name:'🛡️ Warzone resolved • '+w.name,time:new Date().toISOString(),day:today(),warzoneId:w.id});save();showFlowToast('🛡️ WARZONE RESOLVED',w.name)}
+function reopenWarzone(id){let w=s.warzones.find(x=>x.id===id);if(!w)return;w.status='active';s.history.unshift({type:'warzone',name:'⚔️ Warzone reactivated • '+w.name,time:new Date().toISOString(),day:today(),warzoneId:w.id});save();showFlowToast('⚔️ WARZONE ACTIVE',w.name)}
+function restartProjectSuperhero(){if(!confirm('This will erase your local PS data on this device. This cannot be undone from the app. Restart Project Superhero?'))return;localStorage.removeItem(KEY);location.reload()}
 function renderPowers(){s.powers=s.powers.filter(p=>p.until>Date.now());let el=document.getElementById('powers');el.innerHTML=s.powers.length?s.powers.map((p,i)=>`<button style="width:100%;text-align:left;margin:4px 0" onclick="showBlessing(${i})"><div class="row"><b>✨ ${esc(p.name)}</b><span class="small">${fmt(p.until-Date.now())}</span></div><div id="blessDetail${i}" class="small" style="display:none;margin-top:6px">Activated by: <b>${esc(p.activatedBy||'Unknown')}</b><br>Activated: ${new Date(p.activatedAt||Date.now()).toLocaleString()}</div></button>`).join(''):'<div class="empty">No active blessing. Complete objectives and keep moving faithfully.</div>'}
 function showBlessing(i){let el=document.getElementById('blessDetail'+i);if(el)el.style.display=el.style.display==='none'?'block':'none'}
 function fmt(ms){let m=Math.max(0,Math.floor(ms/60000));return `${Math.floor(m/60)}h ${m%60}m`}
@@ -424,28 +492,24 @@ function advanceChain(i){if(i!==s.chain)return;let t=new Date().toISOString(),st
 function saveNotes(){let text=document.getElementById('notesText').value.trim();s.notes=text;s.history.unshift({type:'notes',name:'Updated today’s notes',time:new Date().toISOString(),details:text,day:today()});save();alert('📝 Notes saved to today’s run.')}
 function saveJournal(type){let id=type==='prayer'?'prayerText':'praiseText',text=document.getElementById(id).value.trim();if(!text)return;s.history.unshift({type,name:text,time:new Date().toISOString()});document.getElementById(id).value='';save();alert((type==='prayer'?'🙏 Prayer':'🎵 Praise')+' saved.')}
 function clearHistoryView(){renderHistory()}
+function setHistoryFilter(filter){s.historyFilter=filter;localStorage.setItem(KEY,JSON.stringify(s));renderHistory()}
+function setHistorySort(sort){s.historySort=sort;localStorage.setItem(KEY,JSON.stringify(s));renderHistory()}
+function historyTypeLabel(t){return {mission:'MISSIONS',warzone:'WARZONES',encounter:'ENCOUNTERS',prayer:'PRAYER',praise:'PRAISE',notes:'NOTES',blessing:'BLESSINGS',chain:'EXCELLENCE',excellence:'EXCELLENCE',level:'LEVEL',day:'ALL'}[t]||'ALL'}
 function renderHistory(){
-let el=document.getElementById('history');
-if(!s.history.length){el.innerHTML='<div class="empty">Your story starts here.</div>';return}
-let groups={};
-s.history.forEach((h,i)=>(groups[h.day||h.time.slice(0,10)]??=[]).push({...h,_historyIndex:i}));
-el.innerHTML=Object.entries(groups).map(([day,items])=>`<div class="card" style="margin:10px 0;background:#1a3153"><b>📅 ${new Date(day+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',year:'numeric'})}</b>${items.map(h=>{
-let icon=h.type==='mission'?'✓':h.type==='level'?'⬆':h.type==='prayer'?'🙏':h.type==='praise'?'🎵':h.type==='encounter'?'⚡':h.type==='blessing'?'✨':h.type==='excellence'?'🏆':h.type==='notes'?'📝':'★';
-let expandable=h.type==='encounter'||h.type==='blessing'||h.type==='notes';
-return `<div class="chainstep historyEntry"><div class="num">${icon}</div><div style="flex:1"><button class="historyToggle" onclick="${expandable?`toggleHistory(${h._historyIndex})`:''}"><b>${esc(h.name)}</b><div class="small">${new Date(h.time).toLocaleString()}${h.xp?` • +${h.xp} XP`:''}${expandable?' • tap for details':''}</div></button><div id="historyDetails${h._historyIndex}" class="historyDetails">
-${h.type==='blessing'&&h.source?`<div class="small"><b>Activated by:</b> ${esc(h.source)}</div>`:''}
-${h.type==='notes'&&h.details?`<div class="small"><b>Notes:</b> ${esc(h.details)}</div>`:''}
-${h.type==='encounter'?`
-<div class="small" style="margin-top:6px"><b>Objective:</b> ${esc(h.details||'')}</div>
-<div class="small" style="margin-top:4px"><b>📖 Primary Scripture:</b> ${esc(h.primary||'')}</div>
-${h.actions?`<div class="small" style="margin-top:4px"><b>🛡️ Actions Taken:</b> ${esc(h.actions)}</div>`:''}
-<div class="small" style="margin-top:4px"><b>Rewards:</b> ${h.xp||0} XP • ✝️ ${h.faith||0} • 💙 ${h.hope||0} • ❤️ ${h.love||0}</div>
-`:''}
-</div></div></div>`}).join('')}</div>`).join('');
+ let el=document.getElementById('history'),filters=document.getElementById('historyFilters'),sort=document.getElementById('historySort');
+ const filter=s.historyFilter||'all',order=s.historySort||'newest';
+ const types=[['all','ALL'],['mission','MISSIONS'],['warzone','WARZONES'],['encounter','ENCOUNTERS'],['prayer','PRAYER'],['praise','PRAISE'],['notes','NOTES'],['blessing','BLESSINGS'],['chain','EXCELLENCE'],['level','LEVEL']];
+ if(filters)filters.innerHTML=types.map(([v,l])=>`<button class="${filter===v?'on':''}" onclick="setHistoryFilter('${v}')">${l}</button>`).join('');
+ if(sort)sort.innerHTML=`<button class="${order==='newest'?'on':''}" onclick="setHistorySort('newest')">Newest first</button><button class="${order==='oldest'?'on':''}" onclick="setHistorySort('oldest')">Oldest first</button>`;
+ let items=s.history.map((h,i)=>({...h,_historyIndex:i})).filter(h=>filter==='all'||h.type===filter||(filter==='chain'&&h.type==='excellence'));
+ items.sort((a,b)=>{let av=new Date(a.time).getTime(),bv=new Date(b.time).getTime();return order==='newest'?bv-av:av-bv});
+ if(!items.length){el.innerHTML='<div class="empty">No matching history yet.</div>';return}
+ let groups={};items.forEach(h=>(groups[h.day||h.time.slice(0,10)]??=[]).push(h));
+ el.innerHTML=Object.entries(groups).map(([day,group])=>`<div class="card" style="margin:10px 0;background:#1a3153"><b>📅 ${new Date(day+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',year:'numeric'})}</b>${group.map(h=>{let icon=h.type==='mission'?'✓':h.type==='level'?'⬆':h.type==='prayer'?'🙏':h.type==='praise'?'🙌':h.type==='encounter'?'⚡':h.type==='warzone'?'⚔️':h.type==='blessing'?'✨':h.type==='excellence'||h.type==='chain'?'🏆':h.type==='notes'?'📝':'★';let expandable=['encounter','warzone','blessing','notes'].includes(h.type);return `<div class="chainstep historyEntry"><div class="num">${icon}</div><div style="flex:1"><button class="historyToggle" onclick="${expandable?`toggleHistory(${h._historyIndex})`:''}"><b>${esc(h.name)}</b><div class="small">${new Date(h.time).toLocaleString()}${h.xp?` • +${h.xp} XP`:''}${expandable?' • tap for details':''}</div></button><div id="historyDetails${h._historyIndex}" class="historyDetails">${h.type==='blessing'&&h.source?`<div class="small"><b>Activated by:</b> ${esc(h.source)}</div>`:''}${h.type==='notes'&&h.details?`<div class="small"><b>Notes:</b> ${esc(h.details)}</div>`:''}${h.type==='warzone'?`<div class="small" style="margin-top:6px"><b>Situation:</b> ${esc(h.situation||'')}</div><div class="small" style="margin-top:4px"><b>Counter:</b> ${esc(h.counter||'Not recorded')}</div><div class="small" style="margin-top:4px"><b>Scripture:</b> ${esc(h.scripture||'Not recorded')}</div><div class="small" style="margin-top:4px"><b>Action:</b> ${esc(h.action||'Not recorded')}</div><div class="small" style="margin-top:4px"><b>Result / lesson:</b> ${esc(h.result||'Not recorded')}</div>`:''}${h.type==='encounter'?`<div class="small" style="margin-top:6px"><b>Objective:</b> ${esc(h.details||'')}</div><div class="small" style="margin-top:4px"><b>📖 Primary Scripture:</b> ${esc(h.primary||'')}</div>${h.actions?`<div class="small" style="margin-top:4px"><b>🛡️ Actions Taken:</b> ${esc(h.actions)}</div>`:''}<div class="small" style="margin-top:4px"><b>Rewards:</b> ${h.xp||0} XP • ✝️ ${h.faith||0} • 💙 ${h.hope||0} • ❤️ ${h.love||0}</div>`:''}</div></div></div>`}).join('')}</div>`).join('');
 }
 function toggleHistory(i){let el=document.getElementById('historyDetails'+i);if(el)el.classList.toggle('open')}
 
-function show(id,btn){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function show(id,btn){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));let target=document.getElementById(id);if(!target)return;target.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
 window.addEventListener('load',()=>{
   const splash=document.getElementById('psSplash');
   if(!splash)return;
