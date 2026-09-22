@@ -258,6 +258,52 @@ input,textarea{font-size:16px}
   .psCompanionBubble{bottom:92px;max-width:180px;font-size:11px}
 }
 
+
+/* PS MOBILE POLISH v2 — authoritative overrides for the actual phone layout */
+.nav button .navIcon{display:block;font-size:18px;line-height:1;margin-bottom:4px}
+.nav button .navLabel{display:block;font-size:12px;line-height:1.1}
+@media (max-width:600px){
+  .app{padding-bottom:calc(146px + env(safe-area-inset-bottom))}
+  .nav{min-height:92px;height:auto;padding-top:4px;padding-bottom:env(safe-area-inset-bottom)}
+  .navin{min-height:92px}
+  .nav button{min-height:92px;height:92px;padding:10px 1px 8px;font-size:12px;line-height:1.1;font-weight:750}
+  .nav button .navIcon{font-size:25px;line-height:1;margin-bottom:7px}
+  .nav button .navLabel{font-size:13.5px;line-height:1.05;white-space:nowrap}
+  .nav button.active{font-weight:900}
+  .flowToast{bottom:calc(112px + env(safe-area-inset-bottom))}
+  .psCompanionDock{
+    width:clamp(150px,42vw,176px);
+    height:clamp(150px,42vw,176px);
+    right:clamp(16px,5vw,24px);
+    bottom:calc(116px + env(safe-area-inset-bottom));
+    z-index:7;
+  }
+  .psCompanionBubble{
+    bottom:calc(clamp(150px,42vw,176px) - 4px);
+    max-width:min(230px,58vw);
+    font-size:13px;
+    padding:9px 11px;
+  }
+}
+@media (max-width:380px){
+  .app{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+  .nav,.navin{min-height:84px}
+  .nav button{min-height:84px;height:84px;padding:8px 0 7px}
+  .nav button .navIcon{font-size:22px;margin-bottom:6px}
+  .nav button .navLabel{font-size:11.5px}
+  .psCompanionDock{width:clamp(136px,40vw,150px);height:clamp(136px,40vw,150px);right:12px;bottom:calc(108px + env(safe-area-inset-bottom))}
+  .psCompanionBubble{bottom:calc(clamp(136px,40vw,150px) - 3px);max-width:180px;font-size:11.5px}
+}
+@media (max-width:700px) and (orientation:landscape){
+  .app{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+  .nav,.navin{min-height:70px}
+  .nav button{min-height:70px;height:70px}
+  .nav button .navIcon{font-size:19px;margin-bottom:3px}
+  .nav button .navLabel{font-size:10.5px}
+  .psCompanionDock{width:118px;height:118px;right:14px;bottom:calc(82px + env(safe-area-inset-bottom))}
+  .psCompanionBubble{bottom:108px;font-size:11px}
+}
+
 </style>
 </head>
 <body>
@@ -380,12 +426,12 @@ input,textarea{font-size:16px}
 <div id="flowToast" class="flowToast"></div>
 
 <div class="nav"><div class="navin" style="grid-template-columns:repeat(6,1fr)">
-<button class="active" onclick="show('hud',this)">🏠<br>HUD</button>
-<button onclick="show('missionsView',this)">📡<br>Dispatch</button>
-<button onclick="show('warzones',this)">⚔️<br>Warzones</button>
-<button onclick="show('world',this)">🌎<br>World</button>
-<button onclick="show('journal',this)">📝<br>Journal</button>
-<button onclick="show('log',this)">📜<br>History</button>
+<button class="active" onclick="show('hud',this)"><span class="navIcon">🏠</span><span class="navLabel">HUD</span></button>
+<button onclick="show('missionsView',this)"><span class="navIcon">📡</span><span class="navLabel">Dispatch</span></button>
+<button onclick="show('warzones',this)"><span class="navIcon">⚔️</span><span class="navLabel">Warzones</span></button>
+<button onclick="show('world',this)"><span class="navIcon">🌎</span><span class="navLabel">World</span></button>
+<button onclick="show('journal',this)"><span class="navIcon">📝</span><span class="navLabel">Journal</span></button>
+<button onclick="show('log',this)"><span class="navIcon">📜</span><span class="navLabel">History</span></button>
 </div></div>
 
 <script>
