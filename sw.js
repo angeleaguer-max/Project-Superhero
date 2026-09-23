@@ -1,4 +1,4 @@
-const CACHE_NAME = "project-superhero-v2";
+const CACHE_NAME = "project-superhero-v3";
 
 const APP_FILES = [
   "./",
@@ -28,13 +28,18 @@ self.addEventListener("activate", event => {
   );
 });
 
+self.addEventListener("message", event => {
+  if (event.data === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   const requestURL = new URL(event.request.url);
 
-  // Always check the network for the HTML/app shell.
-  // This prevents the phone from getting stuck on an old index.html.
+  // Always check the network for the app shell.
   if (
     requestURL.pathname.endsWith("/") ||
     requestURL.pathname.endsWith("/index.html")
@@ -56,20 +61,22 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Other assets can still use the cache-first strategy.
+  // Other assets use cache-first for faster loading.
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
+    caches.match(event.request)
+      .then(cached => {
+        if (cached) return cached;
 
-      return fetch(event.request).then(response => {
-        const copy = response.clone();
+        return fetch(event.request).then(response => {
+          const copy = response.clone();
 
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, copy);
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, copy);
+          });
+
+          return response;
         });
-
-        return response;
-      });
-    }).catch(() => caches.match("./index.html"))
+      })
+      .catch(() => caches.match("./index.html"))
   );
 });
